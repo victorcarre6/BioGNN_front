@@ -6,10 +6,17 @@ Interface utilisateur pour la prédiction de propriétés biologiques de molécu
 import os
 import streamlit as st
 import requests
-from rdkit import Chem
-from rdkit.Chem import Draw, Descriptors
-from PIL import Image
 from typing import Tuple, Dict, Optional, Any
+
+# Import conditionnel de RDKit (peut ne pas être disponible sur certaines plateformes)
+try:
+    from rdkit import Chem
+    from rdkit.Chem import Draw, Descriptors
+    from PIL import Image
+    RDKIT_AVAILABLE = True
+except ImportError:
+    RDKIT_AVAILABLE = False
+    st.warning("⚠️ RDKit n'est pas disponible. La visualisation moléculaire sera limitée.")
 
 # ============================================================================
 # CONFIGURATION
@@ -178,6 +185,16 @@ def validate_smiles(smiles: str) -> Tuple[bool, str]:
     """
     Valide un SMILES et retourne (is_valid, message)
     """
+    if not RDKIT_AVAILABLE:
+        # Validation basique sans RDKit
+        if not smiles or len(smiles) < 1:
+            return False, "SMILES vide"
+        # Vérification basique de caractères valides
+        valid_chars = set("CNOPSFClBrI[]()=#@+-0123456789cnops")
+        if not all(c in valid_chars for c in smiles):
+            return False, "Caractères invalides dans le SMILES"
+        return True, "SMILES accepté (validation basique) ✓"
+
     try:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
@@ -186,10 +203,13 @@ def validate_smiles(smiles: str) -> Tuple[bool, str]:
     except Exception as e:
         return False, f"Erreur: {str(e)}"
 
-def smiles_to_image(smiles: str, size=(300, 300)) -> Optional[Image.Image]:
+def smiles_to_image(smiles: str, size=(300, 300)) -> Optional[Any]:
     """
     Convertit un SMILES en image de molécule
     """
+    if not RDKIT_AVAILABLE:
+        return None
+
     try:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
@@ -204,6 +224,12 @@ def get_molecule_properties(smiles: str) -> Dict[str, Any]:
     """
     Calcule les propriétés de base d'une molécule
     """
+    if not RDKIT_AVAILABLE:
+        return {
+            "SMILES": smiles,
+            "Note": "RDKit non disponible - propriétés limitées"
+        }
+
     try:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
@@ -397,9 +423,15 @@ def main():
 
             with col_mol1:
                 st.markdown('<div class="molecule-container">', unsafe_allow_html=True)
-                mol_img = smiles_to_image(smiles_input, size=(400, 400))
-                if mol_img:
-                    st.image(mol_img, use_container_width=True)
+                if RDKIT_AVAILABLE:
+                    mol_img = smiles_to_image(smiles_input, size=(400, 400))
+                    if mol_img:
+                        st.image(mol_img, use_container_width=True)
+                    else:
+                        st.info("🧪 Impossible de générer l'image de la molécule")
+                else:
+                    st.info("🧪 **Visualisation moléculaire non disponible**\n\nRDKit n'est pas installé. La molécule sera traitée par l'API backend.")
+                    st.code(smiles_input, language="text")
                 st.markdown('</div>', unsafe_allow_html=True)
 
             with col_mol2:

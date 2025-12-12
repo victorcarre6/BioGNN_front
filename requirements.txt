@@ -7,8 +7,9 @@ streamlit>=1.28.0
 # Communication avec l'API
 requests>=2.31.0
 
-# Chimie et visualisation moléculaire
-rdkit>=2023.9.1
+# Chimie et visualisation moléculaire (optionnel - peut ne pas fonctionner sur toutes les plateformes)
+# Si rdkit échoue, l'app continuera de fonctionner sans visualisation moléculaire
+rdkit-pypi>=2022.9.5
 pillow>=10.0.0
 
 # Utilitaires
