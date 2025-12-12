@@ -7,16 +7,15 @@ import os
 import streamlit as st
 import requests
 from typing import Tuple, Dict, Optional, Any
+import streamlit.components.v1 as components
 
-# Import conditionnel de RDKit (peut ne pas être disponible sur certaines plateformes)
+# Import conditionnel de RDKit pour les propriétés moléculaires (optionnel)
 try:
     from rdkit import Chem
-    from rdkit.Chem import Draw, Descriptors
-    from PIL import Image
+    from rdkit.Chem import Descriptors
     RDKIT_AVAILABLE = True
 except ImportError:
     RDKIT_AVAILABLE = False
-    st.warning("⚠️ RDKit n'est pas disponible. La visualisation moléculaire sera limitée.")
 
 # ============================================================================
 # CONFIGURATION
@@ -203,22 +202,52 @@ def validate_smiles(smiles: str) -> Tuple[bool, str]:
     except Exception as e:
         return False, f"Erreur: {str(e)}"
 
-def smiles_to_image(smiles: str, size=(300, 300)) -> Optional[Any]:
+def render_molecule_3d(smiles: str, height: int = 400, width: int = 400) -> str:
     """
-    Convertit un SMILES en image de molécule
-    """
-    if not RDKIT_AVAILABLE:
-        return None
+    Génère une visualisation 3D interactive d'une molécule avec py3Dmol
 
-    try:
-        mol = Chem.MolFromSmiles(smiles)
-        if mol is None:
-            return None
-        img = Draw.MolToImage(mol, size=size)
-        return img
-    except Exception as e:
-        st.error(f"Erreur lors de la génération de l'image: {e}")
-        return None
+    Args:
+        smiles: String SMILES de la molécule
+        height: Hauteur du viewer en pixels
+        width: Largeur du viewer en pixels
+
+    Returns:
+        HTML string pour affichage avec st.components.html
+    """
+    html = f"""
+    <html>
+    <head>
+        <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    </head>
+    <body>
+        <div id="container" style="height: {height}px; width: {width}px; position: relative;"></div>
+        <script>
+            let element = document.getElementById('container');
+            let config = {{ backgroundColor: 'white' }};
+            let viewer = $3Dmol.createViewer(element, config);
+
+            // Convertir SMILES en structure 3D via PubChem
+            // Fallback: afficher juste le SMILES si la conversion échoue
+            fetch('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{smiles}/SDF')
+                .then(response => response.text())
+                .then(sdf => {{
+                    viewer.addModel(sdf, 'sdf');
+                    viewer.setStyle({{}}, {{stick: {{}}, sphere: {{radius: 0.3}}}});
+                    viewer.zoomTo();
+                    viewer.render();
+                }})
+                .catch(error => {{
+                    // Si PubChem échoue, afficher un message
+                    element.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">' +
+                        '<p><strong>Molécule:</strong> {smiles}</p>' +
+                        '<p style="font-size: 0.9em;">Visualisation 3D non disponible</p>' +
+                        '</div>';
+                }});
+        </script>
+    </body>
+    </html>
+    """
+    return html
 
 def get_molecule_properties(smiles: str) -> Dict[str, Any]:
     """
@@ -422,17 +451,10 @@ def main():
             col_mol1, col_mol2 = st.columns([1, 1])
 
             with col_mol1:
-                st.markdown('<div class="molecule-container">', unsafe_allow_html=True)
-                if RDKIT_AVAILABLE:
-                    mol_img = smiles_to_image(smiles_input, size=(400, 400))
-                    if mol_img:
-                        st.image(mol_img, use_container_width=True)
-                    else:
-                        st.info("🧪 Impossible de générer l'image de la molécule")
-                else:
-                    st.info("🧪 **Visualisation moléculaire non disponible**\n\nRDKit n'est pas installé. La molécule sera traitée par l'API backend.")
-                    st.code(smiles_input, language="text")
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown("#### 🧬 Structure 3D Interactive")
+                # Générer la visualisation 3D avec py3Dmol
+                mol_html = render_molecule_3d(smiles_input, height=400, width=500)
+                components.html(mol_html, height=450, scrolling=False)
 
             with col_mol2:
                 st.markdown("#### 📊 Propriétés moléculaires")

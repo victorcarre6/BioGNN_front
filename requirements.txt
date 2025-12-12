@@ -7,10 +7,10 @@ streamlit>=1.28.0
 # Communication avec l'API
 requests>=2.31.0
 
-# Chimie et visualisation moléculaire (optionnel - peut ne pas fonctionner sur toutes les plateformes)
-# Si rdkit échoue, l'app continuera de fonctionner sans visualisation moléculaire
-rdkit==2023.9.4
-pillow>=10.0.0
+# Calcul de propriétés moléculaires (optionnel)
+# RDKit est utilisé uniquement pour calculer les propriétés, pas pour la visualisation
+# La visualisation 3D se fait via py3Dmol (intégré en JavaScript, pas de package Python)
+rdkit-pypi>=2022.9.5
 
 # Utilitaires
 python-dotenv>=1.0.0
