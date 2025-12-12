@@ -346,7 +346,7 @@ def get_pubchem_publications(smiles: str, max_results: int = 5) -> List[Dict[str
             "message": f"Impossible de récupérer les publications: {str(e)}"
         }]
 
-def call_api(smiles: str, property_name: str, organism: str = "Homo sapiens") -> Dict[str, Any]:
+def call_api(smiles: str, property_name: str, organism: str = "Homo sapiens", model: str = "immunity") -> Dict[str, Any]:
     """
     Appelle l'API GCP pour obtenir une prédiction
 
@@ -354,6 +354,7 @@ def call_api(smiles: str, property_name: str, organism: str = "Homo sapiens") ->
         smiles: SMILES de la molécule
         property_name: Propriété biologique à prédire
         organism: Organisme cible pour la prédiction
+        model: Modèle à utiliser (immunity ou antiox)
 
     TODO: Adapter les paramètres selon votre API
     """
@@ -364,7 +365,8 @@ def call_api(smiles: str, property_name: str, organism: str = "Homo sapiens") ->
         params = {
             "smiles": smiles,
             "property": property_name,
-            "organism": organism
+            "organism": organism,
+            "model": model
         }
 
         # Appel API
@@ -460,54 +462,69 @@ def main():
                 st.error(msg)
 
     with col2:
+        st.markdown("#### 🤖 Modèle")
+
+        # Sélection du modèle
+        model_choice = st.selectbox(
+            "Sélectionnez le modèle:",
+            ["immunity", "antiox"],
+            label_visibility="collapsed"
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 🎯 Propriété Cible")
 
-        # Sélection de propriété
-        properties = [
-            "Activité antimicrobienne",
-            "Stress oxydatif & défenses",
-            "Cycle cellulaire & prolifération",
-            "Mort cellulaire",
-            "Inflammation & immunité",
-            "Signalisation cellulaire",
-            "Intégrité génomique",
-            "Métabolisme énergétique",
-            "Homéostasie tissulaire",
-            "Fonctions spécifiques d'organes"
-        ]
+        # Configuration des propriétés par modèle
+        properties_by_model = {
+            "immunity": [
+                "Activité antimicrobienne",
+                "Stress oxydatif & défenses",
+                "Cycle cellulaire & prolifération",
+                "Mort cellulaire",
+                "Inflammation & immunité",
+                "Signalisation cellulaire",
+                "Intégrité génomique",
+                "Métabolisme énergétique",
+                "Homéostasie tissulaire",
+                "Fonctions spécifiques d'organes"
+            ],
+            "antiox": [
+                "Antioxidant activity"
+            ]
+        }
 
+        # Sélection de propriété selon le modèle
         selected_property = st.selectbox(
             "Sélectionnez la propriété à prédire:",
-            properties,
+            properties_by_model[model_choice],
             label_visibility="collapsed"
         )
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 🧬 Organisme Cible")
 
-        # Sélection d'organisme
-        organism_groups = {
-            "🐭 Mammal": ["Homo sapiens", "Mus musculus", "Rattus norvegicus", "Bos taurus", "Canis lupus familiaris"],
-            "🦠 Bacteria": ["Escherichia coli", "Mycobacterium tuberculosis", "Staphylococcus aureus", "Bacillus subtilis", "Pseudomonas aeruginosa"],
-            "🍄 Fungus": ["Candida albicans", "Saccharomyces cerevisiae", "Aspergillus fumigatus"],
-            "🦟 Insect": ["Drosophila melanogaster", "Aedes aegypti", "Anopheles gambiae"],
-            "🌱 Plant": ["Arabidopsis thaliana", "Oryza sativa", "Nicotiana tabacum"],
-            "🧪 Other": ["Toxoplasma gondii", "Plasmodium falciparum", "Trypanosoma brucei", "Leishmania donovani"]
+        # Configuration des organismes par modèle
+        organisms_by_model = {
+            "immunity": [
+                "Chlorocebus sabaeus",
+                "Severe acute respiratory syndrome coronavirus 2"
+            ],
+            "antiox": [
+                "Bacteria",
+                "Fungus",
+                "Insect",
+                "Mammal",
+                "Plant",
+                "Unknown"
+            ]
         }
 
-        # Créer une liste déroulante avec groupes
-        organism_options = []
-        for group, organisms in organism_groups.items():
-            organism_options.extend([f"{group} - {org}" for org in organisms])
-
-        selected_organism_full = st.selectbox(
+        # Sélection d'organisme selon le modèle
+        selected_organism = st.selectbox(
             "Sélectionnez l'organisme:",
-            organism_options,
+            organisms_by_model[model_choice],
             label_visibility="collapsed"
         )
-
-        # Extraire le nom de l'organisme (sans le préfixe du groupe)
-        selected_organism = selected_organism_full.split(" - ")[-1] if " - " in selected_organism_full else selected_organism_full
 
     # Bouton de prédiction
     st.markdown("<br>", unsafe_allow_html=True)
@@ -589,10 +606,10 @@ def main():
             st.markdown("### 🎯 Prédiction")
 
             # Afficher les paramètres de prédiction
-            st.info(f"🧬 **Organisme:** {selected_organism} | 🎯 **Propriété:** {selected_property}")
+            st.info(f"🤖 **Modèle:** {model_choice} | 🧬 **Organisme:** {selected_organism} | 🎯 **Propriété:** {selected_property}")
 
             with st.spinner("🔄 Analyse en cours..."):
-                result = call_api(smiles_input, selected_property, selected_organism)
+                result = call_api(smiles_input, selected_property, selected_organism, model_choice)
 
             if result["success"]:
                 # TODO: ADAPTER L'AFFICHAGE SELON LA STRUCTURE DE VOTRE API
