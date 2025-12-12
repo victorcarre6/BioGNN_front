@@ -10,7 +10,7 @@ requests>=2.31.0
 # Calcul de propriétés moléculaires (optionnel)
 # RDKit est utilisé uniquement pour calculer les propriétés, pas pour la visualisation
 # La visualisation 3D se fait via py3Dmol (intégré en JavaScript, pas de package Python)
-rdkit-pypi>=2022.9.5
+rdkit>=2022.9.5
 
 # Utilitaires
 python-dotenv>=1.0.0
