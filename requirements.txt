@@ -1,15 +1,15 @@
-# This should normally be a relatively short requirements.txt
+# Requirements pour BioGNN Immunity Frontend
+# Application Streamlit pour la prédiction de propriétés biologiques
 
-# If you think of adding scikit-learn or tensorflow here, think again!
-# This is the front-end. Heavy calculations go in the back-end, no?
+# Framework principal
+streamlit>=1.28.0
 
-# Sreamlit and extensions
-streamlit
-requests
+# Communication avec l'API
+requests>=2.31.0
 
+# Chimie et visualisation moléculaire
+rdkit>=2023.9.1
+pillow>=10.0.0
 
-# If you want to display datasets, or if your API returns you dataframes,
-# you might need to add some extra stuff hereunder, e.g. pandas
-
-# Data science
-# pandas
+# Utilitaires
+python-dotenv>=1.0.0

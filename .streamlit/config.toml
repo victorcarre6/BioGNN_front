@@ -1,6 +1,18 @@
+# Configuration du thème Streamlit pour BioGNN Immunity
+# Thème inspiré de l'image draft.png avec couleurs olive/vert
+
 [theme]
-primaryColor="666b6e"
-backgroundColor="#f5f7fa"
-secondaryBackgroundColor="#9dc8e4"
-textColor="#22223b"
+primaryColor="#b8e986"          # Vert clair pour le texte de prédiction
+backgroundColor="#2d3a2e"       # Fond vert olive foncé
+secondaryBackgroundColor="#4a5d4e"  # Vert olive moyen pour les cartes
+textColor="#e0e0e0"             # Texte gris clair
 font="sans serif"
+
+[server]
+headless = true
+port = 8501
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
