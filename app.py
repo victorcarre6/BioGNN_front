@@ -6,7 +6,7 @@ Interface utilisateur pour la prédiction de propriétés biologiques de molécu
 import os
 import streamlit as st
 import requests
-from typing import Tuple, Dict, Optional, Any
+from typing import Tuple, Dict, Optional, Any, List
 import streamlit.components.v1 as components
 
 # Import conditionnel de RDKit pour les propriétés moléculaires (optionnel)
@@ -16,6 +16,13 @@ try:
     RDKIT_AVAILABLE = True
 except ImportError:
     RDKIT_AVAILABLE = False
+
+# Import de PubChemPy
+try:
+    import pubchempy as pcp
+    PUBCHEM_AVAILABLE = True
+except ImportError:
+    PUBCHEM_AVAILABLE = False
 
 # ============================================================================
 # CONFIGURATION
@@ -249,37 +256,104 @@ def render_molecule_3d(smiles: str, height: int = 400, width: int = 400) -> str:
     """
     return html
 
-def get_molecule_properties(smiles: str) -> Dict[str, Any]:
+def get_pubchem_publications(smiles: str, max_results: int = 5) -> List[Dict[str, Any]]:
     """
-    Calcule les propriétés de base d'une molécule
+    Récupère les publications scientifiques liées à une molécule via PubChem
+
+    Args:
+        smiles: String SMILES de la molécule
+        max_results: Nombre maximum de publications à retourner
+
+    Returns:
+        Liste de dictionnaires contenant les informations des publications
     """
-    if not RDKIT_AVAILABLE:
-        return {
-            "SMILES": smiles,
-            "Note": "RDKit non disponible - propriétés limitées"
-        }
+    if not PUBCHEM_AVAILABLE:
+        return [{
+            "error": "PubChemPy non disponible",
+            "message": "Impossible de récupérer les publications"
+        }]
 
     try:
-        mol = Chem.MolFromSmiles(smiles)
-        if mol is None:
-            return {}
+        # Rechercher le composé via SMILES
+        compounds = pcp.get_compounds(smiles, 'smiles')
 
-        return {
-            "Masse moléculaire": f"{Descriptors.MolWt(mol):.2f} g/mol",
-            "LogP": f"{Descriptors.MolLogP(mol):.2f}",
-            "Nombre d'atomes": mol.GetNumAtoms(),
-            "Nombre de liaisons": mol.GetNumBonds(),
-            "Donneurs H": Descriptors.NumHDonors(mol),
-            "Accepteurs H": Descriptors.NumHAcceptors(mol),
-            "Cycles aromatiques": Descriptors.NumAromaticRings(mol),
-        }
+        if not compounds:
+            return [{
+                "title": "Aucun composé trouvé",
+                "message": "Cette molécule n'est pas référencée dans PubChem"
+            }]
+
+        compound = compounds[0]
+        cid = compound.cid
+
+        # Récupérer les publications via l'API PubChem REST
+        # Utiliser l'API PubMed via PubChem
+        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/xrefs/PubMedID/JSON"
+
+        response = requests.get(url, timeout=10)
+
+        if response.status_code != 200:
+            return [{
+                "title": f"Composé trouvé: {compound.iupac_name or 'Sans nom'}",
+                "cid": cid,
+                "message": "Aucune publication PubMed trouvée pour ce composé"
+            }]
+
+        data = response.json()
+        pmids = data.get('InformationList', {}).get('Information', [{}])[0].get('PubMedID', [])
+
+        if not pmids:
+            return [{
+                "title": f"Composé: {compound.iupac_name or 'CID ' + str(cid)}",
+                "cid": cid,
+                "message": "Aucune publication disponible"
+            }]
+
+        # Limiter au nombre demandé
+        pmids = pmids[:max_results]
+
+        # Récupérer les détails des publications via PubMed
+        publications = []
+        for pmid in pmids:
+            try:
+                # API PubMed pour récupérer les détails
+                pubmed_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id={pmid}&retmode=json"
+                pub_response = requests.get(pubmed_url, timeout=5)
+
+                if pub_response.status_code == 200:
+                    pub_data = pub_response.json()
+                    result = pub_data.get('result', {}).get(str(pmid), {})
+
+                    publications.append({
+                        "pmid": pmid,
+                        "title": result.get('title', 'Titre non disponible'),
+                        "authors": ', '.join([author.get('name', '') for author in result.get('authors', [])[:3]]),
+                        "journal": result.get('fulljournalname', result.get('source', 'Journal inconnu')),
+                        "year": result.get('pubdate', 'Date inconnue').split()[0],
+                        "url": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
+                    })
+            except Exception:
+                continue
+
+        return publications if publications else [{
+            "title": "Erreur lors de la récupération des publications",
+            "message": "Impossible de charger les détails depuis PubMed"
+        }]
+
     except Exception as e:
-        st.error(f"Erreur calcul propriétés: {e}")
-        return {}
+        return [{
+            "error": "Erreur",
+            "message": f"Impossible de récupérer les publications: {str(e)}"
+        }]
 
-def call_api(smiles: str, property_name: str) -> Dict[str, Any]:
+def call_api(smiles: str, property_name: str, organism: str = "Homo sapiens") -> Dict[str, Any]:
     """
     Appelle l'API GCP pour obtenir une prédiction
+
+    Args:
+        smiles: SMILES de la molécule
+        property_name: Propriété biologique à prédire
+        organism: Organisme cible pour la prédiction
 
     TODO: Adapter les paramètres selon votre API
     """
@@ -289,7 +363,8 @@ def call_api(smiles: str, property_name: str) -> Dict[str, Any]:
         # Paramètres de la requête - ADAPTER SELON VOTRE API
         params = {
             "smiles": smiles,
-            "property": property_name
+            "property": property_name,
+            "organism": organism
         }
 
         # Appel API
@@ -340,26 +415,6 @@ def main():
 
     # Sidebar - Informations et paramètres
     with st.sidebar:
-        st.markdown("### ⚙️ Configuration")
-
-        # Afficher l'URL de l'API (pour debug)
-        with st.expander("🔗 API Configuration"):
-            st.code(BASE_URI, language="text")
-
-            # Test de connexion
-            if st.button("🔍 Tester la connexion API"):
-                try:
-                    health_url = BASE_URI.rstrip('/') + '/health'
-                    response = requests.get(health_url, timeout=5)
-                    if response.status_code == 200:
-                        st.success("✅ API accessible")
-                    else:
-                        st.error(f"⚠️ Status: {response.status_code}")
-                except Exception as e:
-                    st.error(f"❌ Erreur: {str(e)}")
-
-        st.markdown("---")
-
         # Exemples de SMILES
         st.markdown("### 📋 Exemples de SMILES")
         examples = {
@@ -377,8 +432,8 @@ def main():
         st.markdown("---")
         st.markdown("### 📖 À propos")
         st.info("""
-        **BioGNN Immunity** utilise des Graph Neural Networks pour prédire
-        les propriétés biologiques de molécules à partir de leur structure SMILES.
+        **BioGNN** utilise des Graph Neural Networks pour prédire
+        les propriétés biologiques de molécules à partir de leur structure SMILES et d'une base.
         """)
 
     # Zone principale - Input
@@ -427,6 +482,33 @@ def main():
             label_visibility="collapsed"
         )
 
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("#### 🧬 Organisme Cible")
+
+        # Sélection d'organisme
+        organism_groups = {
+            "🐭 Mammal": ["Homo sapiens", "Mus musculus", "Rattus norvegicus", "Bos taurus", "Canis lupus familiaris"],
+            "🦠 Bacteria": ["Escherichia coli", "Mycobacterium tuberculosis", "Staphylococcus aureus", "Bacillus subtilis", "Pseudomonas aeruginosa"],
+            "🍄 Fungus": ["Candida albicans", "Saccharomyces cerevisiae", "Aspergillus fumigatus"],
+            "🦟 Insect": ["Drosophila melanogaster", "Aedes aegypti", "Anopheles gambiae"],
+            "🌱 Plant": ["Arabidopsis thaliana", "Oryza sativa", "Nicotiana tabacum"],
+            "🧪 Other": ["Toxoplasma gondii", "Plasmodium falciparum", "Trypanosoma brucei", "Leishmania donovani"]
+        }
+
+        # Créer une liste déroulante avec groupes
+        organism_options = []
+        for group, organisms in organism_groups.items():
+            organism_options.extend([f"{group} - {org}" for org in organisms])
+
+        selected_organism_full = st.selectbox(
+            "Sélectionnez l'organisme:",
+            organism_options,
+            label_visibility="collapsed"
+        )
+
+        # Extraire le nom de l'organisme (sans le préfixe du groupe)
+        selected_organism = selected_organism_full.split(" - ")[-1] if " - " in selected_organism_full else selected_organism_full
+
     # Bouton de prédiction
     st.markdown("<br>", unsafe_allow_html=True)
     col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
@@ -457,24 +539,60 @@ def main():
                 components.html(mol_html, height=450, scrolling=False)
 
             with col_mol2:
-                st.markdown("#### 📊 Propriétés moléculaires")
-                props = get_molecule_properties(smiles_input)
+                st.markdown("#### 📚 Publications Scientifiques Récentes")
 
-                if props:
-                    for key, value in props.items():
-                        st.markdown(f"""
-                        <div class="info-box">
-                            <strong>{key}:</strong> {value}
-                        </div>
-                        """, unsafe_allow_html=True)
+                with st.spinner("🔍 Recherche de publications..."):
+                    publications = get_pubchem_publications(smiles_input, max_results=5)
+
+                if publications and not publications[0].get('error'):
+                    for i, pub in enumerate(publications, 1):
+                        if 'pmid' in pub:
+                            # Publication complète
+                            st.markdown(f"""
+                            <div class="info-box" style="margin-bottom: 1rem;">
+                                <p style="margin: 0; font-size: 0.85rem; color: #9db89d; font-weight: 600;">
+                                    #{i} • {pub['year']}
+                                </p>
+                                <p style="margin: 0.5rem 0; font-weight: 600; font-size: 0.95rem;">
+                                    {pub['title']}
+                                </p>
+                                <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #c0c0c0;">
+                                    <strong>Auteurs:</strong> {pub['authors']}
+                                </p>
+                                <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #c0c0c0;">
+                                    <strong>Journal:</strong> {pub['journal']}
+                                </p>
+                                <a href="{pub['url']}" target="_blank" style="
+                                    display: inline-block;
+                                    margin-top: 0.5rem;
+                                    padding: 0.3rem 0.8rem;
+                                    background: #6b8e6b;
+                                    color: white;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    font-size: 0.85rem;
+                                    transition: background 0.3s;
+                                ">
+                                    📖 Lire sur PubMed
+                                </a>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            # Message d'information ou d'erreur
+                            st.info(f"ℹ️ {pub.get('title', 'Information')} - {pub.get('message', '')}")
+                else:
+                    st.warning("⚠️ Aucune publication trouvée pour cette molécule dans PubChem/PubMed")
 
             st.markdown("---")
 
             # Appel à l'API
             st.markdown("### 🎯 Prédiction")
 
+            # Afficher les paramètres de prédiction
+            st.info(f"🧬 **Organisme:** {selected_organism} | 🎯 **Propriété:** {selected_property}")
+
             with st.spinner("🔄 Analyse en cours..."):
-                result = call_api(smiles_input, selected_property)
+                result = call_api(smiles_input, selected_property, selected_organism)
 
             if result["success"]:
                 # TODO: ADAPTER L'AFFICHAGE SELON LA STRUCTURE DE VOTRE API

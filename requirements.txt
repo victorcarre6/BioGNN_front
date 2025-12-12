@@ -7,6 +7,9 @@ streamlit>=1.28.0
 # Communication avec l'API
 requests>=2.31.0
 
+# Chimie et données PubChem
+pubchempy>=1.0.4
+
 # Calcul de propriétés moléculaires (optionnel)
 # RDKit est utilisé uniquement pour calculer les propriétés, pas pour la visualisation
 # La visualisation 3D se fait via py3Dmol (intégré en JavaScript, pas de package Python)
