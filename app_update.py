@@ -414,9 +414,7 @@ def call_api(smiles: str, property_name: str, organism: str = "Homo sapiens", mo
         # Paramètres de la requête - ADAPTER SELON VOTRE API
         params = {
             "smiles": smiles,
-            "property": property_name,
-            "organism": organism,
-            "model": model
+            "organism": organism
         }
 
         # Appel API
@@ -640,13 +638,12 @@ def main():
             st.markdown("<h3 style='text-align: center;'>Prédiction</h3>",unsafe_allow_html=True)
 
             # Afficher les paramètres de prédiction
-            st.info(f"🤖 **Modèle:** {model_choice} | 🧬 **Organisme:** {selected_organism} | 🎯 **Propriété:** {selected_property}")
+            st.info(f" 🧬 **Organisme:** {selected_organism}")
 
             with st.spinner("🔄 Analyse en cours..."):
-                result = call_api(smiles_input, selected_property, selected_organism, model_choice)
+                result = call_api(smiles_input, selected_organism)
 
             if result["success"]:
-                # TODO: ADAPTER L'AFFICHAGE SELON LA STRUCTURE DE VOTRE API
 
                 st.markdown('<div class="prediction-card">', unsafe_allow_html=True)
 
