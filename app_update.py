@@ -298,89 +298,74 @@ st.markdown("""
 # FONCTIONS UTILITAIRES
 # ============================================================================
 
+@st.dialog("🧬 Notre Équipe", width="large")
 def show_team_modal():
     """
     Affiche un modal avec les informations des membres de l'équipe
     """
     team_members = [
         {
-            "name": "Victor Carré, PhD in Organic Chemistry",
-            "photo": "https://via.placeholder.com/150",  # Remplacer par l'URL réelle de la photo
-            "description": "Description du rôle et des compétences du membre 1",
-            "links": {
-                "LinkedIn": "www.linkedin.com/in/victor-carré",
-                "GitHub": "https://github.com/victorcarre6"
-            }
+            "name": "Victor Carré",
+            "title": "PhD in Organic Chemistry",
+            "photo": "https://media.licdn.com/dms/image/v2/D4E03AQGVWlViiqc8YA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721578462243?e=1767225600&v=beta&t=PXmCdebrZyzU2R3SLz_0VEEkzK-2uOXEn8pLOaXJf_M",
+            "description": "Placeholder",
+            "linkedin": "https://www.linkedin.com/in/victor-carré",
+            "github": "https://github.com/victorcarre6"
         },
         {
-            "name": "Nisha Dwivedi, PhD in Molecular Biology",
+            "name": "Nisha Dwivedi",
+            "title": "PhD in Molecular Biology",
             "photo": "https://avatars.githubusercontent.com/u/97964928?v=4",
-            "description": "Description du rôle et des compétences du membre 2",
-            "links": {
-                "LinkedIn": "https://www.linkedin.com/in/nisha-dwivedi-108b64206/",
-                "GitHub": "https://github.com/nishadwivedi97"
-            }
+            "description": "Placeholder",
+            "linkedin": "https://www.linkedin.com/in/nisha-dwivedi-108b64206/",
+            "github": "https://github.com/nishadwivedi97"
         },
         {
             "name": "Jalil Kheloufi",
+            "title": "Data Scientist",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
             "description": "Placeholder",
-            "links": {
-                "LinkedIn": "https://www.linkedin.com/in/jalilkheloufi/",
-                "GitHub": "https://github.com/Soipadeg"
-            }
+            "linkedin": "https://www.linkedin.com/in/jalilkheloufi/",
+            "github": "https://github.com/Soipadeg"
         },
         {
             "name": "Jean-Charles Bodart",
+            "title": "Data Engineer",
             "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
             "description": "Placeholder",
-            "links": {
-                "LinkedIn": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
-                "GitHub": "https://github.com/jeancharlesbodart-commits"
-            }
+            "linkedin": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
+            "github": "https://github.com/jeancharlesbodart-commits"
         }
     ]
 
-    # Construire le HTML du modal
-    members_html = ""
-    for member in team_members:
-        links_html = ""
-        for link_name, link_url in member["links"].items():
-            links_html += f'<a href="{link_url}" target="_blank">{link_name}</a>'
+    # Afficher les membres en colonnes
+    cols = st.columns(4)
 
-        members_html += f"""
-        <div class="team-member">
-            <img src="{member['photo']}" alt="{member['name']}">
-            <h3>{member['name']}</h3>
-            <p>{member['description']}</p>
-            <div class="team-links">
-                {links_html}
-            </div>
-        </div>
-        """
+    for idx, member in enumerate(team_members):
+        with cols[idx]:
+            # Photo
+            st.markdown(f"""
+                <div style="text-align: center;">
+                    <img src="{member['photo']}"
+                         style="width: 150px; height: 150px; border-radius: 50%;
+                                object-fit: cover; border: 3px solid #b8e986;
+                                margin-bottom: 1rem;">
+                </div>
+            """, unsafe_allow_html=True)
 
-    modal_html = f"""
-    <div id="teamModal" class="team-modal">
-        <div class="team-modal-content">
-            <span class="close-modal" onclick="document.getElementById('teamModal').style.display='none'">&times;</span>
-            <h2 style="color: #b8e986; text-align: center; margin-bottom: 1rem;">🧬 Notre Équipe</h2>
-            <div class="team-grid">
-                {members_html}
-            </div>
-        </div>
-    </div>
-    <script>
-        // Fermer le modal en cliquant en dehors
-        window.onclick = function(event) {{
-            var modal = document.getElementById('teamModal');
-            if (event.target == modal) {{
-                modal.style.display = "none";
-            }}
-        }}
-    </script>
-    """
+            # Nom et titre
+            st.markdown(f"<h4 style='text-align: center; color: #b8e986; margin: 0.5rem 0;'>{member['name']}</h4>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; color: #9db89d; font-size: 0.9rem; margin: 0.3rem 0;'>{member['title']}</p>", unsafe_allow_html=True)
 
-    components.html(modal_html, height=700, scrolling=True)
+            # Description
+            st.markdown(f"<p style='text-align: center; color: #d4d4d4; font-size: 0.85rem; margin: 1rem 0;'>{member['description']}</p>", unsafe_allow_html=True)
+
+            # Liens
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"<a href='{member['linkedin']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #0077b5; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>LinkedIn</a>", unsafe_allow_html=True)
+            with col2:
+                st.markdown(f"<a href='{member['github']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #333; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>GitHub</a>", unsafe_allow_html=True)
 
 def validate_smiles(smiles: str) -> Tuple[bool, str]:
     """
@@ -685,7 +670,7 @@ def main():
 
         # Bouton pour afficher l'équipe
         if st.button("👥 About the team", use_container_width=True):
-            st.session_state['show_team'] = True
+            show_team_modal()
 
     # Zone principale - Input
     col1, col2 = st.columns([1, 1])
@@ -881,12 +866,6 @@ def main():
 
     elif predict_button:
         st.warning("⚠️ Veuillez entrer un SMILES valide")
-
-    # Affichage du modal de l'équipe si le bouton a été cliqué
-    if st.session_state.get('show_team', False):
-        show_team_modal()
-        # Réinitialiser l'état après affichage
-        st.session_state['show_team'] = False
 
     # Footer
     st.markdown("---")
