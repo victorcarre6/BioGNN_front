@@ -306,7 +306,7 @@ def show_team_modal():
     team_members = [
         {
             "name": "Victor Carré",
-            "title": "PhD in Organic Chemistry",
+            "title": "PhD in Organic Chemistry\nData Scientist",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQGVWlViiqc8YA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721578462243?e=1767225600&v=beta&t=PXmCdebrZyzU2R3SLz_0VEEkzK-2uOXEn8pLOaXJf_M",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/victor-carré",
@@ -314,7 +314,7 @@ def show_team_modal():
         },
         {
             "name": "Nisha Dwivedi",
-            "title": "PhD in Molecular Biology",
+            "title": "PhD in Molecular Biology\nData Scientist",
             "photo": "https://avatars.githubusercontent.com/u/97964928?v=4",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/nisha-dwivedi-108b64206/",
@@ -330,7 +330,7 @@ def show_team_modal():
         },
         {
             "name": "Jean-Charles Bodart",
-            "title": "Data Engineer",
+            "title": "Data Scientist",
             "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
