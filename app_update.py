@@ -355,7 +355,7 @@ def show_team_modal():
 
             # Nom et titre
             st.markdown(f"<h4 style='text-align: center; color: #b8e986; margin: 0.5rem 0;'>{member['name']}</h4>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center; color: #9db89d; font-size: 0.9rem; margin: 0.3rem 0;'>{member['title']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; color: #9db89d; font-size: 0.9rem; margin: 0.3rem 0; white-space: pre-line;'>{member['title']}</p>", unsafe_allow_html=True)
 
             # Description
             st.markdown(f"<p style='text-align: center; color: #d4d4d4; font-size: 0.85rem; margin: 1rem 0;'>{member['description']}</p>", unsafe_allow_html=True)
