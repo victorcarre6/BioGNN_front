@@ -179,12 +179,193 @@ st.markdown("""
         text-align: center;
         margin: 0.5rem 0;
     }
+
+    /* Team Modal */
+    .team-modal {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .team-modal-content {
+        background: linear-gradient(135deg, #2d3a2e 0%, #3d4a3e 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        max-width: 900px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        border: 2px solid #6b8e6b;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .team-member {
+        background: linear-gradient(135deg, #4a5d4e 0%, #5a6d5e 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #6b7d6b;
+        text-align: center;
+    }
+
+    .team-member img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #b8e986;
+        margin-bottom: 1rem;
+    }
+
+    .team-member h3 {
+        color: #b8e986;
+        margin: 0.5rem 0;
+        font-size: 1.2rem;
+    }
+
+    .team-member p {
+        color: #d4d4d4;
+        font-size: 0.9rem;
+        margin: 0.5rem 0;
+    }
+
+    .team-links {
+        display: flex;
+        justify-content: center;
+        gap: 0.8rem;
+        margin-top: 0.8rem;
+    }
+
+    .team-links a {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        background: #6b8e6b;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        transition: background 0.3s;
+    }
+
+    .team-links a:hover {
+        background: #7a9d7a;
+    }
+
+    .close-modal {
+        color: #b8e986;
+        float: right;
+        font-size: 2rem;
+        font-weight: bold;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .close-modal:hover {
+        color: #9db89d;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================================
 # FONCTIONS UTILITAIRES
 # ============================================================================
+
+def show_team_modal():
+    """
+    Affiche un modal avec les informations des membres de l'équipe
+    """
+    team_members = [
+        {
+            "name": "Victor Carré, PhD in Organic Chemistry",
+            "photo": "https://via.placeholder.com/150",  # Remplacer par l'URL réelle de la photo
+            "description": "Description du rôle et des compétences du membre 1",
+            "links": {
+                "LinkedIn": "www.linkedin.com/in/victor-carré",
+                "GitHub": "https://github.com/victorcarre6"
+            }
+        },
+        {
+            "name": "Nisha Dwivedi, PhD in Molecular Biology",
+            "photo": "https://avatars.githubusercontent.com/u/97964928?v=4",
+            "description": "Description du rôle et des compétences du membre 2",
+            "links": {
+                "LinkedIn": "https://www.linkedin.com/in/nisha-dwivedi-108b64206/",
+                "GitHub": "https://github.com/nishadwivedi97"
+            }
+        },
+        {
+            "name": "Jalil Kheloufi",
+            "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
+            "description": "Placeholder",
+            "links": {
+                "LinkedIn": "https://www.linkedin.com/in/jalilkheloufi/",
+                "GitHub": "https://github.com/Soipadeg"
+            }
+        },
+        {
+            "name": "Jean-Charles Bodart",
+            "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
+            "description": "Placeholder",
+            "links": {
+                "LinkedIn": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
+                "GitHub": "https://github.com/jeancharlesbodart-commits"
+            }
+        }
+    ]
+
+    # Construire le HTML du modal
+    members_html = ""
+    for member in team_members:
+        links_html = ""
+        for link_name, link_url in member["links"].items():
+            links_html += f'<a href="{link_url}" target="_blank">{link_name}</a>'
+
+        members_html += f"""
+        <div class="team-member">
+            <img src="{member['photo']}" alt="{member['name']}">
+            <h3>{member['name']}</h3>
+            <p>{member['description']}</p>
+            <div class="team-links">
+                {links_html}
+            </div>
+        </div>
+        """
+
+    modal_html = f"""
+    <div id="teamModal" class="team-modal">
+        <div class="team-modal-content">
+            <span class="close-modal" onclick="document.getElementById('teamModal').style.display='none'">&times;</span>
+            <h2 style="color: #b8e986; text-align: center; margin-bottom: 1rem;">🧬 Notre Équipe</h2>
+            <div class="team-grid">
+                {members_html}
+            </div>
+        </div>
+    </div>
+    <script>
+        // Fermer le modal en cliquant en dehors
+        window.onclick = function(event) {{
+            var modal = document.getElementById('teamModal');
+            if (event.target == modal) {{
+                modal.style.display = "none";
+            }}
+        }}
+    </script>
+    """
+
+    components.html(modal_html, height=700, scrolling=True)
 
 def validate_smiles(smiles: str) -> Tuple[bool, str]:
     """
@@ -396,7 +577,7 @@ def get_organism_info(organism_name: str) -> str:
     # Retourner l'information ou un message par défaut
     return organism_info.get(organism_name, f"Organisme modèle utilisé en recherche biomédicale pour l'étude de diverses propriétés biologiques et le développement de nouveaux composés thérapeutiques.")
 
-def call_api(smiles: str, property_name: str, organism: str = "Homo sapiens", model: str = "immunity") -> Dict[str, Any]:
+def call_api(smiles: str, organism: str = "Homo sapiens") -> Dict[str, Any]:
     """
     Appelle l'API GCP pour obtenir une prédiction
 
@@ -476,15 +657,20 @@ def main():
         }
 
         for name, smiles in examples.items():
-            if st.button(f"💊 {name}", use_container_width=True):
+            if st.button(f"{name}", use_container_width=True):
                 st.session_state['example_smiles'] = smiles
 
         st.markdown("---")
         st.markdown("### 📖 À propos")
-        st.info("""
+        st.success("""
         **BioGNN** utilise des Graph Neural Networks pour prédire
         les propriétés biologiques de molécules à partir de leur structure SMILES et d'un organisme modèle cible.
+        Projet réalisé dans le cadre des projets du Bootcamp Data Science & IA de Le Wagon.
         """)
+
+        # Bouton pour afficher l'équipe
+        if st.button("👥 About the team", use_container_width=True):
+            st.session_state['show_team'] = True
 
     # Zone principale - Input
     col1, col2 = st.columns([1, 1])
@@ -677,10 +863,15 @@ def main():
 
             else:
                 st.error(f"❌ {result['error']}")
-                st.info("💡 Vérifiez que l'URL de l'API est correctement configurée dans le code")
 
     elif predict_button:
         st.warning("⚠️ Veuillez entrer un SMILES valide")
+
+    # Affichage du modal de l'équipe si le bouton a été cliqué
+    if st.session_state.get('show_team', False):
+        show_team_modal()
+        # Réinitialiser l'état après affichage
+        st.session_state['show_team'] = False
 
     # Footer
     st.markdown("---")
