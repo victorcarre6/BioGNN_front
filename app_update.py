@@ -199,7 +199,8 @@ st.markdown("""
         background: linear-gradient(135deg, #2d3a2e 0%, #3d4a3e 100%);
         padding: 2rem;
         border-radius: 15px;
-        max-width: 900px;
+        max-width: 95%;
+        width: 1200px;
         max-height: 90vh;
         overflow-y: auto;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
@@ -207,10 +208,12 @@ st.markdown("""
     }
 
     .team-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        display: flex;
+        flex-direction: row;
         gap: 1.5rem;
         margin-top: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
     .team-member {
@@ -219,27 +222,39 @@ st.markdown("""
         border-radius: 12px;
         border: 2px solid #6b7d6b;
         text-align: center;
+        flex: 0 1 250px;
+        min-width: 220px;
     }
 
     .team-member img {
-        width: 120px;
-        height: 120px;
+        width: 150px;
+        height: 150px;
+        min-width: 150px;
+        min-height: 150px;
+        max-width: 150px;
+        max-height: 150px;
         border-radius: 50%;
         object-fit: cover;
+        object-position: center;
         border: 3px solid #b8e986;
         margin-bottom: 1rem;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .team-member h3 {
         color: #b8e986;
         margin: 0.5rem 0;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+        line-height: 1.3;
     }
 
     .team-member p {
         color: #d4d4d4;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         margin: 0.5rem 0;
+        line-height: 1.4;
     }
 
     .team-links {
