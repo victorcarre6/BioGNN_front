@@ -36,8 +36,7 @@ st.set_page_config(
 )
 
 # API Configuration
-# TODO: INSÉRER L'URL DE VOTRE API GOOGLE CLOUD RUN ICI
-GCP_API_URL = "https://your-cloud-run-service.run.app"  # ← REMPLACER PAR L'URL GCP
+GCP_API_URL = "https://biognn-api-271034908172.europe-west1.run.app/"
 
 # Fallback sur secrets.toml si disponible
 if 'API_URI' in os.environ:
