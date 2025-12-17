@@ -422,49 +422,67 @@ def show_model_info():
     model_info = [
         {
             "title": "Source des données",
-            "logo": "",
-            "description": "Les données d'entrainement proviennent de la base publique ChemBL, regroupant plus de 2.8 millions de tests biologiques.",
+            "logo": "https://avatars.githubusercontent.com/u/3062531?s=280&v=4",
+            "description": "Les données d'entrainement proviennent de la base publique ChemBL, regroupant plus de 2.8 millions de tests biologiques et 1.7 millions de molécules.",
             "ref": "https://www.ebi.ac.uk/chembl/"
         },
         {
             "title": "Neural Networks",
-            "logo": "",
-            "description": "Architecture FlexibleMultiHeadGNN pour prédiction multi-propriétés, combinant GCN, GIN et GAT.",
+            "logo": "https://thumbs.dreamstime.com/b/neural-network-cloud-technologies-global-database-artificial-intelligence-bright-black-white-background-big-data-d-200490439.jpg",
+            "description": "BioGNN est un modèle de Deep Learning reposant sur une architecture de réseaux de neurones graphiques et des mécanismes d'attention head inspiré de l'IA générative.",
             "ref": "https://pytorch.org/docs/stable/nn.html"
         },
         {
-            "title": "Features Moléculaires",
-            "logo": "",
-            "description": "Extraction de 29 features moléculaires via RDKit, incluant propriétés physico-chimiques et topologiques.",
-            "ref": "https://www.rdkit.org/"
+            "title": "Technologies",
+            "logo": "https://avatars.githubusercontent.com/u/57251745?s=280&v=4",
+            "description": "Le projet se base sur le paquet PyTorch, exploite la librairie de chemoinformatique RDKit, et le framework Optuna pour l'optimisation des réseaux neuronaux.",
+            "ref": "https://www.rdkit.org/",
+            "ref2": "https://optuna.org/"
         },
         {
-            "title": "Préprocessing",
-            "logo": "",
-            "description": "Normalisation via RobustScaler appliquée sur les features MLP avant prédiction.",
-            "ref": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"
-        },
-        {
-            "title": "Toxicité",
-            "logo": "",
-            "description": "Modèle OptimizableMultiBranchGNN entraîné pour prédire la toxicité sur 6 organismes supportés.",
-            "ref": "https://pytorch.org/docs/stable/nn.html"
+            "title": "Performances",
+            "logo": "https://cdn.dribbble.com/userupload/41870104/file/original-2b633babbb87748069a3c2924124a344.gif",
+            "description": "Le modèle atteint une précision de 85% sur un jeu de test indépendant, montrant sa capacité à généraliser sur des molécules. Les limitations du modèle se situent dans sa capacité à généraliser sur le type d'espèce.",
+            "ref" : "https://arxiv.org/abs/2507.03430"
         }
     ]
 
-    # Afficher les cartes en colonnes (similaire à show_team_modal)
-    cols = st.columns(5)
+    # Afficher les cartes en colonnes (4 colonnes maintenant)
+    cols = st.columns(4)
 
     for idx, info in enumerate(model_info):
         with cols[idx]:
-            # Titre
-            st.markdown(f"<h4 style='text-align: center; color: #b8e986; font-size: 1.5rem; margin: 0.5rem 0;'>{info['title']}</h4>", unsafe_allow_html=True)
+            # Logo avec hauteur fixe
+            if 'logo' in info and info['logo']:
+                st.markdown(f"""
+                    <div style="text-align: center; height: 140px; display: flex; align-items: center; justify-content: center;">
+                        <img src="{info['logo']}"
+                             style="width: 120px; height: 120px; border-radius: 10px;
+                                    object-fit: cover; border: 2px solid #b8e986;">
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("<div style='height: 140px;'></div>", unsafe_allow_html=True)
 
-            # Description
-            st.markdown(f"<p style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1.5rem 0;'>{info['description']}</p>", unsafe_allow_html=True)
+            # Titre avec hauteur fixe
+            st.markdown(f"<div style='text-align: center; color: #b8e986; font-size: 1.3rem; margin: 0.5rem 0; height: 2.6rem; display: flex; align-items: center; justify-content: center; font-weight: bold;'>{info['title']}</div>", unsafe_allow_html=True)
 
-            # Lien
-            st.markdown(f"<a href='{info['ref']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #6b8e6b; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>En savoir plus</a>", unsafe_allow_html=True)
+            # Description avec hauteur fixe
+            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1.1rem; margin: 1rem 0; line-height: 1.4; height: 100px; display: flex; align-items: top; justify-content: center;'>{info['description']}</div>", unsafe_allow_html=True)
+
+            # Liens (gérer ref et ref2 pour Librairies) avec hauteur fixe
+            st.markdown("<div style='height: 50px; display: flex; align-items: center;'>", unsafe_allow_html=True)
+            if 'ref2' in info:
+                # Cas spécial: deux liens (Librairies)
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(f"<a href='{info['ref']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #6b8e6b; color: white; text-decoration: none; border-radius: 5px; font-size: 0.95rem;'>RDKit</a>", unsafe_allow_html=True)
+                with col2:
+                    st.markdown(f"<a href='{info['ref2']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #6b8e6b; color: white; text-decoration: none; border-radius: 5px; font-size: 0.95rem;'>Optuna</a>", unsafe_allow_html=True)
+            elif 'ref' in info:
+                # Cas normal: un seul lien
+                st.markdown(f"<a href='{info['ref']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #6b8e6b; color: white; text-decoration: none; border-radius: 5px; font-size: 0.95rem;'>En savoir plus</a>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
 
@@ -638,41 +656,41 @@ def get_organism_info(organism_name: str) -> str:
         Description de l'organisme
     """
     organism_info = {
-        'Rattus norvegicus': "Le rat norvégien (Rattus norvegicus), également appelé rat brun ou surmulot, est une espèce de rongeurs très utilisée en recherche biomédicale. C'est un organisme modèle important pour l'étude de la physiologie, de la pharmacologie et du comportement. Sa proximité génétique avec l'homme en fait un modèle précieux pour la recherche sur les maladies humaines.",
+        'Rattus norvegicus': "Le rat norvégien (Rattus norvegicus), également appelé rat brun ou surmulot, est une espèce de rongeurs très utilisée en recherche biomédicale.\n\nC'est un organisme modèle important pour l'étude de la physiologie, de la pharmacologie et du comportement.\n\nSa proximité génétique avec l'homme en fait un modèle précieux pour la recherche sur les maladies humaines.",
 
-        'Saccharomyces cerevisiae': "Saccharomyces cerevisiae, communément appelée levure de boulanger ou levure de bière, est un organisme eucaryote unicellulaire. C'est l'un des organismes modèles les plus étudiés en biologie cellulaire et moléculaire. Son génome a été le premier d'un eucaryote à être entièrement séquencé en 1996.",
+        'Saccharomyces cerevisiae': "Saccharomyces cerevisiae, communément appelée levure de boulanger ou levure de bière, est un organisme eucaryote unicellulaire.\n\nC'est l'un des organismes modèles les plus étudiés en biologie cellulaire et moléculaire.\n\nSon génome a été le premier d'un eucaryote à être entièrement séquencé en 1996.",
 
-        'Bos taurus': "Bos taurus est le nom scientifique du bœuf domestique ou bovin. Bien que principalement élevé pour l'agriculture, il est également utilisé en recherche biomédicale, notamment pour l'étude du métabolisme, de la reproduction et de certaines maladies zoonotiques.",
+        'Bos taurus': "Bos taurus est le nom scientifique du bœuf domestique ou bovin.\n\nBien que principalement élevé pour l'agriculture, il est également utilisé en recherche biomédicale, notamment pour l'étude du métabolisme, de la reproduction et de certaines maladies zoonotiques.",
 
-        'Cavia porcellus': "Le cobaye (Cavia porcellus), également appelé cochon d'Inde, est un rongeur originaire d'Amérique du Sud. C'est un organisme modèle important en immunologie, en nutrition et en recherche sur les maladies infectieuses. Contrairement à la plupart des mammifères, il ne peut pas synthétiser la vitamine C.",
+        'Cavia porcellus': "Le cobaye (Cavia porcellus), également appelé cochon d'Inde, est un rongeur originaire d'Amérique du Sud.\n\nC'est un organisme modèle important en immunologie, en nutrition et en recherche sur les maladies infectieuses.\n\nContrairement à la plupart des mammifères, il ne peut pas synthétiser la vitamine C.",
 
-        'Oryctolagus cuniculus': "Le lapin de garenne (Oryctolagus cuniculus) est utilisé comme organisme modèle en recherche biomédicale, notamment en immunologie, en toxicologie et en recherche cardiovasculaire. Il est particulièrement utile pour la production d'anticorps et l'étude de certaines maladies oculaires.",
+        'Oryctolagus cuniculus': "Le lapin de garenne (Oryctolagus cuniculus) est utilisé comme organisme modèle en recherche biomédicale, notamment en immunologie, en toxicologie et en recherche cardiovasculaire.\n\nIl est particulièrement utile pour la production d'anticorps et l'étude de certaines maladies oculaires.",
 
-        'Cricetulus griseus': "Le hamster chinois (Cricetulus griseus) est un petit rongeur originaire de Chine et de Mongolie. Ses cellules ovariennes (cellules CHO) sont largement utilisées en biotechnologie pour la production de protéines thérapeutiques et en recherche sur la génétique cellulaire.",
+        'Cricetulus griseus': "Le hamster chinois (Cricetulus griseus) est un petit rongeur originaire de Chine et de Mongolie.\n\nSes cellules ovariennes (cellules CHO) sont largement utilisées en biotechnologie pour la production de protéines thérapeutiques et en recherche sur la génétique cellulaire.",
 
-        'Chlorocebus sabaeus': "Le singe vert (Chlorocebus sabaeus) est un primate originaire d'Afrique de l'Ouest. Il est utilisé comme organisme modèle en recherche biomédicale, notamment pour l'étude des maladies infectieuses, du VIH/SIDA et des troubles neurologiques en raison de sa proximité phylogénétique avec l'homme.",
+        'Chlorocebus sabaeus': "Le singe vert (Chlorocebus sabaeus) est un primate originaire d'Afrique de l'Ouest.\n\nIl est utilisé comme organisme modèle en recherche biomédicale, notamment pour l'étude des maladies infectieuses, du VIH/SIDA et des troubles neurologiques en raison de sa proximité phylogénétique avec l'homme.",
 
-        'Mus musculus': "La souris de laboratoire (Mus musculus) est l'organisme modèle mammifère le plus utilisé en recherche biomédicale. Son génome, très similaire à celui de l'homme, permet d'étudier de nombreuses maladies humaines. Elle est utilisée dans pratiquement tous les domaines de la recherche biologique.",
+        'Mus musculus': "La souris de laboratoire (Mus musculus) est l'organisme modèle mammifère le plus utilisé en recherche biomédicale.\n\nSon génome, très similaire à celui de l'homme, permet d'étudier de nombreuses maladies humaines.\n\nElle est utilisée dans pratiquement tous les domaines de la recherche biologique.",
 
-        'Escherichia coli': "Escherichia coli (E. coli) est une bactérie intestinale commune qui constitue l'un des organismes modèles les plus importants en biologie moléculaire et en génétique microbienne. Elle est largement utilisée en biotechnologie pour la production de protéines recombinantes et comme hôte pour le clonage génétique.",
+        'Escherichia coli': "Escherichia coli (E. coli) est une bactérie intestinale commune qui constitue l'un des organismes modèles les plus importants en biologie moléculaire et en génétique microbienne.\n\nElle est largement utilisée en biotechnologie pour la production de protéines recombinantes et comme hôte pour le clonage génétique.",
 
-        'Trypanosoma cruzi': "Trypanosoma cruzi est un protozoaire parasite responsable de la maladie de Chagas, une maladie tropicale négligée affectant des millions de personnes en Amérique latine. C'est un organisme modèle important pour l'étude des maladies parasitaires et le développement de nouveaux traitements antiparasitaires.",
+        'Trypanosoma cruzi': "Trypanosoma cruzi est un protozoaire parasite responsable de la maladie de Chagas, une maladie tropicale négligée affectant des millions de personnes en Amérique latine.\n\nC'est un organisme modèle important pour l'étude des maladies parasitaires et le développement de nouveaux traitements antiparasitaires.",
 
-        'Human immunodeficiency virus 1': "Le virus de l'immunodéficience humaine de type 1 (VIH-1) est le rétrovirus responsable du SIDA. Il est intensivement étudié en virologie et en immunologie pour comprendre les mécanismes d'infection virale et développer des thérapies antivirales et des vaccins.",
+        'Human immunodeficiency virus 1': "Le virus de l'immunodéficience humaine de type 1 (VIH-1) est le rétrovirus responsable du SIDA.\n\nIl est intensivement étudié en virologie et en immunologie pour comprendre les mécanismes d'infection virale et développer des thérapies antivirales et des vaccins.",
 
-        'Mycobacterium tuberculosis': "Mycobacterium tuberculosis est la bactérie responsable de la tuberculose, l'une des maladies infectieuses les plus mortelles au monde. C'est un organisme modèle crucial pour la recherche sur les maladies infectieuses, le développement d'antibiotiques et l'étude des mécanismes de résistance aux médicaments.",
+        'Mycobacterium tuberculosis': "Mycobacterium tuberculosis est la bactérie responsable de la tuberculose, l'une des maladies infectieuses les plus mortelles au monde.\n\nC'est un organisme modèle crucial pour la recherche sur les maladies infectieuses, le développement d'antibiotiques et l'étude des mécanismes de résistance aux médicaments.",
 
-        'Drosophila': "La drosophile (Drosophila melanogaster), ou mouche du vinaigre, est un organisme modèle fondamental en génétique et en biologie du développement. Son cycle de vie court, sa facilité de culture et son génome bien caractérisé en font un outil précieux pour étudier l'hérédité, le développement embryonnaire et les maladies neurodégénératives.",
+        'Drosophila': "La drosophile (Drosophila melanogaster), ou mouche du vinaigre, est un organisme modèle fondamental en génétique et en biologie du développement.\n\nSon cycle de vie court, sa facilité de culture et son génome bien caractérisé en font un outil précieux pour étudier l'hérédité, le développement embryonnaire et les maladies neurodégénératives.",
 
-        'Schistosoma mansoni': "Schistosoma mansoni est un ver parasite responsable de la schistosomiase, une maladie tropicale affectant des millions de personnes. C'est un organisme modèle important pour l'étude des helminthiases et le développement de médicaments antiparasitaires.",
+        'Schistosoma mansoni': "Schistosoma mansoni est un ver parasite responsable de la schistosomiase, une maladie tropicale affectant des millions de personnes.\n\nC'est un organisme modèle important pour l'étude des helminthiases et le développement de médicaments antiparasitaires.",
 
-        'Caenorhabditis elegans': "Caenorhabditis elegans est un nématode transparent d'environ 1 mm de long. C'est un organisme modèle majeur en biologie du développement, en génétique et en neurobiologie. Son système nerveux simple mais complet, composé de seulement 302 neurones, est entièrement cartographié.",
+        'Caenorhabditis elegans': "Caenorhabditis elegans est un nématode transparent d'environ 1 mm de long.\n\nC'est un organisme modèle majeur en biologie du développement, en génétique et en neurobiologie.\n\nSon système nerveux simple mais complet, composé de seulement 302 neurones, est entièrement cartographié.",
 
-        'Bacillus subtilis': "Bacillus subtilis est une bactérie Gram-positive couramment trouvée dans le sol. C'est un organisme modèle important en microbiologie pour l'étude de la formation des spores, de la différenciation cellulaire et de la production d'enzymes industrielles.",
+        'Bacillus subtilis': "Bacillus subtilis est une bactérie Gram-positive couramment trouvée dans le sol.\n\nC'est un organisme modèle important en microbiologie pour l'étude de la formation des spores, de la différenciation cellulaire et de la production d'enzymes industrielles.",
 
-        'Leishmania mexicana': "Leishmania mexicana est un protozoaire parasite responsable de la leishmaniose cutanée. C'est un organisme modèle pour l'étude des maladies parasitaires tropicales et le développement de nouveaux traitements contre les leishmanioses.",
+        'Leishmania mexicana': "Leishmania mexicana est un protozoaire parasite responsable de la leishmaniose cutanée.\n\nC'est un organisme modèle pour l'étude des maladies parasitaires tropicales et le développement de nouveaux traitements contre les leishmanioses.",
 
-        'Trypanosoma brucei TREU927': "Trypanosoma brucei est un protozoaire parasite responsable de la maladie du sommeil en Afrique. La souche TREU927 est utilisée comme organisme modèle de référence pour l'étude de la biologie des trypanosomes et le développement de médicaments antiparasitaires."
+        'Trypanosoma brucei TREU927': "Trypanosoma brucei est un protozoaire parasite responsable de la maladie du sommeil en Afrique.\n\nLa souche TREU927 est utilisée comme organisme modèle de référence pour l'étude de la biologie des trypanosomes et le développement de médicaments antiparasitaires."
     }
 
     # Retourner l'information ou un message par défaut
@@ -1006,15 +1024,18 @@ def main():
 
             def get_property_description(property_name: str) -> str:
                 """
-                Retourne la description d'une propriété biologique donnée.
+                Retourne la description détaillée d'une propriété biologique prédite par le modèle BioGNN.
                 """
                 descriptions = {
-                "Stress Oxydatif": "Réaction de la cellule face aux radicaux libres et espèces réactives de l'oxygène. Permet d'évaluer le niveau de dommage oxydatif.",
-                "Mort Cellulaire": "Indique la probabilité que la molécule induise l'apoptose ou la nécrose dans les cellules cibles.",
-                "Métabolisme Énergétique": "Impact potentiel sur la production ou la consommation d'énergie cellulaire, incluant mitochondries et voies métaboliques.",
-                "Signalisation Cellulaire": "Effets sur les voies de signalisation intracellulaires et communication entre cellules."
+                "Stress Oxydatif": "Prédiction de l'activité antioxydante et de la modulation du stress oxydatif. Évalue la capacité de la molécule à agir comme antioxydant direct ou indirect.\n\nUn score élevé suggère un potentiel pour des applications nutraceutiques, cosmétiques ou agrochimiques.\n\nNote : la corrélation entre activité in vitro et efficacité in vivo reste un défi majeur dans ce domaine.",
+
+                "Mort Cellulaire": "Prédiction de l'induction de mort cellulaire par différents mécanismes : apoptose, autophagie ou ferroptose. Propriété pertinente pour la découverte de composés anticancéreux, où l'induction sélective dans les cellules tumorales est recherchée.\n\nUn score élevé indique un potentiel cytotoxique significatif.\n\nNote : le mécanisme précis de mort cellulaire et le contexte cellulaire influencent fortement l'activité biologique réelle.",
+
+                "Métabolisme Énergétique": "Prédiction de l'activité sur le métabolisme énergétique cellulaire, incluant la glycolyse et la fonction mitochondriale. Cette propriété capture le potentiel de modulation du métabolisme glucidique et lipidique, avec des applications dans le diabète, l'obésité et le métabolisme tumoral (effet Warburg).\n\nUn score élevé suggère une interaction avec les voies métaboliques centrales.\n\nAttention : la toxicité mitochondriale constitue un effet indésirable majeur à considérer, et l'effet peut varier significativement selon le contexte tissulaire (foie, muscle, tissu adipeux).",
+
+                "Signalisation Cellulaire": "Prédiction de l'activité sur les grandes voies de signalisation intracellulaires, en évaluant le potentiel d'inhibition de kinases ou de modulation de GPCR.\n\nUn score élevé indique une probable interaction avec ces cascades de signalisation qui régulent la prolifération, la différenciation et la réponse immunitaire."
                 }
-                return descriptions.get(property_name, "Description non disponible.")
+                return descriptions.get(property_name, "Description non disponible pour cette propriété.")
 
             # 2 colonnes de même taille
             col_organism, col_properties = st.columns([1, 1])
@@ -1022,7 +1043,7 @@ def main():
             # Colonne 1: Organisme
             with col_organism:
                 st.markdown(f"""
-                <div class="prediction-card" style="text-align: center; min-height: 330px;">
+                <div class="prediction-card" style="text-align: center; min-height: 440px;">
                 <p class="prediction-label">ORGANISME SÉLECTIONNÉ</p>
                 <p class="prediction-text" style="font-size: 1.8rem;">{selected_organism}</p>
                 <div class="info-box" style="margin-top: 1rem; text-align: left;">
@@ -1087,8 +1108,8 @@ def main():
 
                 # Afficher la description de la propriété sélectionnée
                 st.markdown(f"""
-                <div class="info-box" style="margin-top: 1rem;">
-                    <h4 style="color: #b8e986; margin-top: 0;">{selected_prop_name}</h4>
+                <div class="info-box" style="margin-top: 0.1rem;">
+                    <h4 style="color: #b8e986; margin-top: 0; margin-bottom: 0.3rem;">{selected_prop_name}</h4>
                     <p style="margin: 0.8rem 0; color: #e0e0e0; line-height: 1.6;">
                         {get_property_description(selected_prop_name)}
                     </p>
