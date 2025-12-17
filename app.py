@@ -612,37 +612,38 @@ def main():
                 result = call_api(smiles_input, selected_property, selected_organism, model_choice)
 
             if result["success"]:
-                # TODO: ADAPTER L'AFFICHAGE SELON LA STRUCTURE DE VOTRE API
+                data = result["data"]
+
+                properties = data.get("properties", {})
+                summary = data.get("summary", "Résumé non disponible")
 
                 st.markdown('<div class="prediction-card">', unsafe_allow_html=True)
 
-                st.markdown('<p class="prediction-label">PRÉDICTION</p>', unsafe_allow_html=True)
-                st.markdown('<p class="prediction-text">Candidat prometteur</p>', unsafe_allow_html=True)
+                st.markdown('<p class="prediction-label">RÉSUMÉ</p>', unsafe_allow_html=True)
+                st.markdown(
+                    f'<p class="prediction-text" style="font-size:1.4rem;">{summary}</p>',
+                    unsafe_allow_html=True
+                )
 
-                # Afficher les données brutes (à adapter)
-                with st.expander("📊 Détails de la prédiction"):
-                    st.json(result["data"])
+                st.markdown("#### 🧪 Scores par propriété")
+
+                for prop, score in properties.items():
+                    st.markdown(
+                        f"""
+                        <div class="result-card">
+                            <strong>{prop}</strong>
+                            <div style="margin-top:0.3rem;">
+                                Probabilité prédite : <strong>{score:.3f}</strong>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                with st.expander("📊 Réponse brute de l’API"):
+                    st.json(data)
 
                 st.markdown('</div>', unsafe_allow_html=True)
-
-                # Métriques supplémentaires (à adapter selon votre API)
-                st.markdown("#### 📈 Métriques")
-                metric_cols = st.columns(3)
-
-                with metric_cols[0]:
-                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                    st.metric("Score de confiance", "85%")  # TODO: Remplacer par vraie valeur
-                    st.markdown('</div>', unsafe_allow_html=True)
-
-                with metric_cols[1]:
-                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                    st.metric("Probabilité", "0.78")  # TODO: Remplacer par vraie valeur
-                    st.markdown('</div>', unsafe_allow_html=True)
-
-                with metric_cols[2]:
-                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                    st.metric("Classe prédite", "Actif")  # TODO: Remplacer par vraie valeur
-                    st.markdown('</div>', unsafe_allow_html=True)
 
             else:
                 st.error(f"❌ {result['error']}")

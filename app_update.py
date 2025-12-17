@@ -9,6 +9,18 @@ import requests
 from typing import Tuple, Dict, Optional, Any, List
 import streamlit.components.v1 as components
 
+# ===============================
+# Mapping des organismes supportés pour la toxicité
+# ===============================
+ORGANISMS_TOXICITY_MAPPING = {
+    'rattus': 'Rattus norvegicus',
+    'equus': 'Equus caballus',
+    'h1n1': 'Influenza A virus (H1N1)',
+    'ecoli': 'Escherichia coli',
+    'hiv': 'Human immunodeficiency virus 1',
+    'gondii': 'Toxoplasma gondii'
+}
+
 # Import conditionnel de RDKit pour les propriétés moléculaires (optionnel)
 try:
     from rdkit import Chem
@@ -831,35 +843,91 @@ def main():
 
             if result["success"]:
 
+                data = result["data"]
+
+                # ===============================
+                # 🔬 Vérification toxicité si organisme supporté
+                # ===============================
+                selected_organism_tox = selected_organism  # variable déjà utilisée dans le formulaire Streamlit
+
+                if selected_organism_tox in ORGANISMS_TOXICITY_MAPPING.values():
+
+                    tox_payload = {
+                        "smiles": smiles_input,
+                        "organism": selected_organism_tox
+                    }
+
+                    try:
+                        tox_response = requests.post(
+                            f"{BASE_URI}predict_tox",
+                            json=tox_payload,
+                            timeout=15
+                        )
+
+                        if tox_response.status_code == 200:
+                            tox_data = tox_response.json()
+
+                            prob_toxicity = tox_data.get("prob_toxicity", 0.0)
+                            toxic = tox_data.get("toxic", False)
+
+                            if toxic:
+                                st.warning(
+                                    f"La molécule d'intérêt a une probabilité de {prob_toxicity:.3f} "
+                                    f"d'être toxique pour l'organisme étudié"
+                                )
+
+                        else:
+                            st.info("ℹ️ Analyse de toxicité non disponible pour cet organisme")
+
+                    except Exception:
+                        st.info("ℹ️ Impossible de récupérer la prédiction de toxicité")
+
+
+                summary = data.get("summary", "Résumé non disponible")
+                properties = data.get("properties", {})
+
                 st.markdown('<div class="prediction-card">', unsafe_allow_html=True)
 
-                st.markdown('<p class="prediction-label">PRÉDICTION</p>', unsafe_allow_html=True)
-                st.markdown('<p class="prediction-text">Candidat prometteur</p>', unsafe_allow_html=True)
+                st.markdown(
+                    '<p class="prediction-label">RÉSUMÉ BIOLOGIQUE</p>',
+                    unsafe_allow_html=True
+                )
 
-                # Afficher les données brutes (à adapter)
-                with st.expander("📊 Détails de la prédiction"):
-                    st.json(result["data"])
+                st.markdown(
+                    f'<p class="prediction-text" style="font-size:1.5rem;">{summary}</p>',
+                    unsafe_allow_html=True
+                )
+
+                st.markdown("#### 🧪 Scores par propriété biologique")
+
+                for prop, score in properties.items():
+
+                    if score >= 0.7:
+                        color = "#b8e986"
+                    elif score >= 0.4:
+                        color = "#f0d264"
+                    else:
+                        color = "#c0c0c0"
+
+                    st.markdown(
+                        f"""
+                        <div class="result-card">
+                            <strong>{prop}</strong>
+                            <div style="margin-top:0.4rem;">
+                                Probabilité prédite :
+                                <strong style="color:{color};">
+                                    {score:.3f}
+                                </strong>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                with st.expander("📊 Réponse brute de l’API"):
+                    st.json(data)
 
                 st.markdown('</div>', unsafe_allow_html=True)
-
-                # Métriques supplémentaires (à adapter selon votre API)
-                st.markdown("#### 📈 Métriques")
-                metric_cols = st.columns(3)
-
-                with metric_cols[0]:
-                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                    st.metric("Score de confiance", "85%")  # TODO: Remplacer par vraie valeur
-                    st.markdown('</div>', unsafe_allow_html=True)
-
-                with metric_cols[1]:
-                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                    st.metric("Probabilité", "0.78")  # TODO: Remplacer par vraie valeur
-                    st.markdown('</div>', unsafe_allow_html=True)
-
-                with metric_cols[2]:
-                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                    st.metric("Classe prédite", "Actif")  # TODO: Remplacer par vraie valeur
-                    st.markdown('</div>', unsafe_allow_html=True)
 
             else:
                 st.error(f"❌ {result['error']}")
