@@ -334,7 +334,7 @@ def show_team_modal():
         },
         {
             "name": "Jalil Kheloufi",
-            "title": "Data Scientist",
+            "title": "Data Scientist\n",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/jalilkheloufi/",
@@ -342,7 +342,7 @@ def show_team_modal():
         },
         {
             "name": "Jean-Charles Bodart",
-            "title": "Data Scientist",
+            "title": "Data Scientist\n",
             "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
@@ -604,7 +604,7 @@ def call_api(smiles: str, organism: str = "Homo sapiens") -> Dict[str, Any]:
     try:
         url = BASE_URI + "predict"
 
-        # Paramètres de la requête - ADAPTER SELON VOTRE API
+        # Paramètres de la requête
         params = {
             "smiles": smiles,
             "organism": organism
@@ -751,86 +751,7 @@ def main():
         if not is_valid:
             st.error("⚠️ Veuillez entrer un SMILES valide avant de prédire")
         else:
-            # Affichage de la molécule
-            st.markdown("<h3 style='text-align: center;'>La molécule</h3>",unsafe_allow_html=True)
 
-            col_mol1, col_mol2 = st.columns([1, 1])
-
-            with col_mol1:
-                st.markdown("#### 🧬 Structure 3D Interactive")
-                # Générer la visualisation 3D avec py3Dmol
-                mol_html = render_molecule_3d(smiles_input, height=400, width=500)
-                components.html(mol_html, height=450, scrolling=False)
-
-            with col_mol2:
-                st.markdown("#### 📚 Publications Scientifiques")
-
-                with st.spinner("🔍 Recherche de publications..."):
-                    publications = get_pubchem_publications(smiles_input, max_results=2)
-
-                if publications and not publications[0].get('error'):
-                    for i, pub in enumerate(publications, 1):
-                        if 'pmid' in pub:
-                            # Publication complète
-                            st.markdown(f"""
-                            <div class="info-box" style="margin-bottom: 1rem;">
-                                <p style="margin: 0; font-size: 0.85rem; color: #9db89d; font-weight: 600;">
-                                    #{i} • {pub['year']}
-                                </p>
-                                <p style="margin: 0.5rem 0; font-weight: 600; font-size: 0.95rem;">
-                                    {pub['title']}
-                                </p>
-                                <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #c0c0c0;">
-                                    <strong>Auteurs:</strong> {pub['authors']}
-                                </p>
-                                <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #c0c0c0;">
-                                    <strong>Journal:</strong> {pub['journal']}
-                                </p>
-                                <a href="{pub['url']}" target="_blank" style="
-                                    display: inline-block;
-                                    margin-top: 0.5rem;
-                                    padding: 0.3rem 0.8rem;
-                                    background: #6b8e6b;
-                                    color: white;
-                                    text-decoration: none;
-                                    border-radius: 5px;
-                                    font-size: 0.85rem;
-                                    transition: background 0.3s;
-                                ">
-                                    📖 Lire sur PubMed
-                                </a>
-                            </div>
-                            """, unsafe_allow_html=True)
-                        else:
-                            # Message d'information ou d'erreur
-                            st.info(f"ℹ️ {pub.get('title', 'Information')} - {pub.get('message', '')}")
-                else:
-                    st.warning("⚠️ Aucune publication trouvée pour cette molécule dans PubChem/PubMed")
-
-            st.markdown("---")
-
-            # Affichage de l'espèce modèle
-            st.markdown("<h3 style='text-align: center;'>L'espèce modèle</h3>",unsafe_allow_html=True)
-
-            col_species1, col_species2, col_species3 = st.columns([1, 2, 1])
-
-            with col_species2:
-                # Récupérer les informations sur l'organisme
-                organism_description = get_organism_info(selected_organism)
-
-                st.markdown(f"""
-                <div class="prediction-card" style="text-align: center;">
-                    <p class="prediction-label">ORGANISME SÉLECTIONNÉ</p>
-                    <p class="prediction-text" style="font-size: 1.8rem;">{selected_organism}</p>
-                    <div class="info-box" style="margin-top: 1rem; text-align: left;">
-                        <p style="margin: 0.5rem 0; color: #e0e0e0;">
-                            {organism_description}
-                        </p>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-            st.markdown("---")
 
             # Appel à l'API
             st.markdown("<h3 style='text-align: center;'>Prédiction</h3>",unsafe_allow_html=True)
@@ -931,6 +852,88 @@ def main():
 
             else:
                 st.error(f"❌ {result['error']}")
+
+            # Affichage de la molécule
+            st.markdown("<h3 style='text-align: center;'>La molécule</h3>",unsafe_allow_html=True)
+
+            col_mol1, col_mol2 = st.columns([1, 1])
+
+            with col_mol1:
+                st.markdown("#### 🧬 Structure 3D Interactive")
+                # Générer la visualisation 3D avec py3Dmol
+                mol_html = render_molecule_3d(smiles_input, height=400, width=500)
+                components.html(mol_html, height=450, scrolling=False)
+
+            with col_mol2:
+                st.markdown("#### 📚 Publications Scientifiques")
+
+                with st.spinner("🔍 Recherche de publications..."):
+                    publications = get_pubchem_publications(smiles_input, max_results=2)
+
+                if publications and not publications[0].get('error'):
+                    for i, pub in enumerate(publications, 1):
+                        if 'pmid' in pub:
+                            # Publication complète
+                            st.markdown(f"""
+                            <div class="info-box" style="margin-bottom: 1rem;">
+                                <p style="margin: 0; font-size: 0.85rem; color: #9db89d; font-weight: 600;">
+                                    #{i} • {pub['year']}
+                                </p>
+                                <p style="margin: 0.5rem 0; font-weight: 600; font-size: 0.95rem;">
+                                    {pub['title']}
+                                </p>
+                                <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #c0c0c0;">
+                                    <strong>Auteurs:</strong> {pub['authors']}
+                                </p>
+                                <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #c0c0c0;">
+                                    <strong>Journal:</strong> {pub['journal']}
+                                </p>
+                                <a href="{pub['url']}" target="_blank" style="
+                                    display: inline-block;
+                                    margin-top: 0.5rem;
+                                    padding: 0.3rem 0.8rem;
+                                    background: #6b8e6b;
+                                    color: white;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    font-size: 0.85rem;
+                                    transition: background 0.3s;
+                                ">
+                                    📖 Lire sur PubMed
+                                </a>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            # Message d'information ou d'erreur
+                            st.info(f"ℹ️ {pub.get('title', 'Information')} - {pub.get('message', '')}")
+                else:
+                    st.warning("⚠️ Aucune publication trouvée pour cette molécule dans PubChem/PubMed")
+
+            st.markdown("---")
+
+            # Affichage de l'espèce modèle
+            st.markdown("<h3 style='text-align: center;'>L'espèce modèle</h3>",unsafe_allow_html=True)
+
+            col_species1, col_species2, col_species3 = st.columns([1, 2, 1])
+
+            with col_species2:
+                # Récupérer les informations sur l'organisme
+                organism_description = get_organism_info(selected_organism)
+
+                st.markdown(f"""
+                <div class="prediction-card" style="text-align: center;">
+                    <p class="prediction-label">ORGANISME SÉLECTIONNÉ</p>
+                    <p class="prediction-text" style="font-size: 1.8rem;">{selected_organism}</p>
+                    <div class="info-box" style="margin-top: 1rem; text-align: left;">
+                        <p style="margin: 0.5rem 0; color: #e0e0e0;">
+                            {organism_description}
+                        </p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown("---")
+
 
     elif predict_button:
         st.warning("⚠️ Veuillez entrer un SMILES valide")
