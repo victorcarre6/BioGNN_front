@@ -605,13 +605,13 @@ def call_api(smiles: str, organism: str = "Homo sapiens") -> Dict[str, Any]:
         url = BASE_URI + "predict"
 
         # Paramètres de la requête
-        params = {
+        payload = {
             "smiles": smiles,
             "organism": organism
         }
 
         # Appel API
-        response = requests.post(url, params=params, timeout=30)
+        response = requests.post(url, json=payload, timeout=30)
 
         if response.status_code == 200:
             return {
