@@ -334,7 +334,7 @@ def show_team_modal():
         },
         {
             "name": "Jalil Kheloufi",
-            "title": "Data Scientist\n",
+            "title": "Data Scientist\n\n",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/jalilkheloufi/",
@@ -342,7 +342,7 @@ def show_team_modal():
         },
         {
             "name": "Jean-Charles Bodart",
-            "title": "Data Scientist\n",
+            "title": "Data Scientist\n\n",
             "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
@@ -611,7 +611,7 @@ def call_api(smiles: str, organism: str = "Homo sapiens") -> Dict[str, Any]:
         }
 
         # Appel API
-        response = requests.get(url, params=params, timeout=30)
+        response = requests.post(url, params=params, timeout=30)
 
         if response.status_code == 200:
             return {
@@ -932,7 +932,7 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
 
-            st.markdown("---")
+
 
 
     elif predict_button:
