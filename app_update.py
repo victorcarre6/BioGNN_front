@@ -50,16 +50,51 @@ st.set_page_config(
 # API Configuration
 GCP_API_URL = "https://biognn-api-271034908172.europe-west1.run.app/"
 
-# Fallback sur secrets.toml si disponible
-if 'API_URI' in os.environ:
-    BASE_URI = st.secrets.get(os.environ.get('API_URI'), GCP_API_URL)
-elif 'cloud_api_uri' in st.secrets:
-    BASE_URI = st.secrets['cloud_api_uri']
-else:
-    BASE_URI = GCP_API_URL
+def get_api_url():
+    """
+    Détermine l'URL de l'API à utiliser selon l'environnement:
+    1. Si une variable d'environnement API_URL est définie, l'utiliser
+    2. Si en local (détection via secrets), utiliser local_api_uri ou local_docker_uri
+    3. Si cloud_api_uri est défini dans secrets, l'utiliser
+    4. Sinon, utiliser l'URL GCP par défaut
+    """
+    # Priority 1: Variable d'environnement directe
+    if 'API_URL' in os.environ:
+        url = os.environ['API_URL']
+        return url if url.endswith('/') else url + '/'
 
-# Assurer que l'URL se termine par '/'
-BASE_URI = BASE_URI if BASE_URI.endswith('/') else BASE_URI + '/'
+    # Priority 2: Vérifier si secrets.toml existe et contient des URLs
+    try:
+        # Détecter si on est en environnement local
+        # Si local_api_uri ou local_docker_uri existe dans secrets, on est probablement en local
+        if hasattr(st.secrets, 'get'):
+            # Mode local: priorité à local_api_uri si disponible
+            if 'local_api_uri' in st.secrets:
+                # Vérifier si on force l'usage de l'API locale
+                use_local = st.secrets.get('use_local_api', False)
+                if use_local:
+                    url = st.secrets['local_api_uri']
+                    return url if url.endswith('/') else url + '/'
+
+            # Docker local
+            if 'local_docker_uri' in st.secrets:
+                use_docker = st.secrets.get('use_docker_api', False)
+                if use_docker:
+                    url = st.secrets['local_docker_uri']
+                    return url if url.endswith('/') else url + '/'
+
+            # Cloud API (production ou ancien déploiement)
+            if 'cloud_api_uri' in st.secrets:
+                url = st.secrets['cloud_api_uri']
+                return url if url.endswith('/') else url + '/'
+    except Exception:
+        # Si erreur d'accès aux secrets, continuer avec le fallback
+        pass
+
+    # Priority 3: URL GCP par défaut
+    return GCP_API_URL if GCP_API_URL.endswith('/') else GCP_API_URL + '/'
+
+BASE_URI = get_api_url()
 
 # ============================================================================
 # STYLES CSS PERSONNALISÉS
@@ -334,7 +369,7 @@ def show_team_modal():
         },
         {
             "name": "Jalil Kheloufi",
-            "title": "Data Scientist\n\n",
+            "title": "Data Scientist\n ",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/jalilkheloufi/",
@@ -342,7 +377,7 @@ def show_team_modal():
         },
         {
             "name": "Jean-Charles Bodart",
-            "title": "Data Scientist\n\n",
+            "title": "Data Scientist\n ",
             "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
@@ -365,12 +400,12 @@ def show_team_modal():
                 </div>
             """, unsafe_allow_html=True)
 
-            # Nom et titre
-            st.markdown(f"<h4 style='text-align: center; color: #b8e986; margin: 0.5rem 0;'>{member['name']}</h4>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center; color: #9db89d; font-size: 0.9rem; margin: 0.3rem 0; white-space: pre-line;'>{member['title']}</p>", unsafe_allow_html=True)
+            # Nom et titre avec hauteur fixe
+            st.markdown(f"<h4 style='text-align: center; color: #b8e986; font-size: 1.5rem; margin: 0.5rem 0;'>{member['name']}</h4>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; color: #9db89d; font-size: 1rem; margin: 0.3rem 0; height: 2.5rem; line-height: 1.25rem; white-space: pre-line;'>{member['title']}</div>", unsafe_allow_html=True)
 
-            # Description
-            st.markdown(f"<p style='text-align: center; color: #d4d4d4; font-size: 0.85rem; margin: 1rem 0;'>{member['description']}</p>", unsafe_allow_html=True)
+            # Description avec hauteur fixe
+            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1rem 0; height: 1.5rem;'>{member['description']}</div>", unsafe_allow_html=True)
 
             # Liens
             col1, col2 = st.columns(2)
@@ -378,6 +413,60 @@ def show_team_modal():
                 st.markdown(f"<a href='{member['linkedin']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #0077b5; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>LinkedIn</a>", unsafe_allow_html=True)
             with col2:
                 st.markdown(f"<a href='{member['github']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #333; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>GitHub</a>", unsafe_allow_html=True)
+
+@st.dialog("🧠 Informations sur le Modèle", width="large")
+def show_model_info():
+    """
+    Affiche un modal avec les informations techniques sur le modèle BioGNN
+    """
+    model_info = [
+        {
+            "title": "Source des données",
+            "logo": "",
+            "description": "Les données d'entrainement proviennent de la base publique ChemBL, regroupant plus de 2.8 millions de tests biologiques.",
+            "ref": "https://www.ebi.ac.uk/chembl/"
+        },
+        {
+            "title": "Neural Networks",
+            "logo": "",
+            "description": "Architecture FlexibleMultiHeadGNN pour prédiction multi-propriétés, combinant GCN, GIN et GAT.",
+            "ref": "https://pytorch.org/docs/stable/nn.html"
+        },
+        {
+            "title": "Features Moléculaires",
+            "logo": "",
+            "description": "Extraction de 29 features moléculaires via RDKit, incluant propriétés physico-chimiques et topologiques.",
+            "ref": "https://www.rdkit.org/"
+        },
+        {
+            "title": "Préprocessing",
+            "logo": "",
+            "description": "Normalisation via RobustScaler appliquée sur les features MLP avant prédiction.",
+            "ref": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"
+        },
+        {
+            "title": "Toxicité",
+            "logo": "",
+            "description": "Modèle OptimizableMultiBranchGNN entraîné pour prédire la toxicité sur 6 organismes supportés.",
+            "ref": "https://pytorch.org/docs/stable/nn.html"
+        }
+    ]
+
+    # Afficher les cartes en colonnes (similaire à show_team_modal)
+    cols = st.columns(5)
+
+    for idx, info in enumerate(model_info):
+        with cols[idx]:
+            # Titre
+            st.markdown(f"<h4 style='text-align: center; color: #b8e986; font-size: 1.5rem; margin: 0.5rem 0;'>{info['title']}</h4>", unsafe_allow_html=True)
+
+            # Description
+            st.markdown(f"<p style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1.5rem 0;'>{info['description']}</p>", unsafe_allow_html=True)
+
+            # Lien
+            st.markdown(f"<a href='{info['ref']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #6b8e6b; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>En savoir plus</a>", unsafe_allow_html=True)
+
+
 
 def validate_smiles(smiles: str) -> Tuple[bool, str]:
     """
@@ -663,8 +752,6 @@ def main():
         examples = {
             "Aspirine": "CC(=O)Oc1ccccc1C(=O)O",
             "Caféine": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
-            "Éthanol": "CCO",
-            "Glucose": "C(C1C(C(C(C(O1)O)O)O)O)O",
             "Pénicilline G": "CC1(C(N2C(S1)C(C2=O)NC(=O)Cc3ccccc3)C(=O)O)C"
         }
 
@@ -674,15 +761,16 @@ def main():
 
         st.markdown("---")
         st.markdown("### 📖 À propos")
-        st.success("""
-        **BioGNN** utilise des Graph Neural Networks pour prédire
-        les propriétés biologiques de molécules à partir de leur structure SMILES et d'un organisme modèle cible.
+        st.markdown("""
+        **BioGNN** est un modèle prédictif d'activité biologique. Insérez le code SMILES d'une molécule et l'organisme d'étude pour prédire les propriétés sur lesquelles elle aura un impact.\n
         Projet réalisé dans le cadre des projets du Bootcamp Data Science & IA de Le Wagon.
         """)
-
+        st.markdown("---")
         # Bouton pour afficher l'équipe
         if st.button("👥 About the team", use_container_width=True):
             show_team_modal()
+        if st.button("🧠 About the model", use_container_width=True):
+            show_model_info()
 
     # Zone principale - Input
     col1, col2 = st.columns([1, 1])
@@ -745,84 +833,95 @@ def main():
     # AFFICHAGE DES RÉSULTATS
     # ========================================================================
 
+    # Gérer les résultats dans session_state pour éviter les rechargements
     if predict_button and smiles_input:
         is_valid, _ = validate_smiles(smiles_input)
 
         if not is_valid:
             st.error("⚠️ Veuillez entrer un SMILES valide avant de prédire")
         else:
-
-
             # Appel à l'API
-            st.markdown("<h3 style='text-align: center;'>Prédiction</h3>",unsafe_allow_html=True)
-
-            # Afficher les paramètres de prédiction
-            st.info(f" 🧬 **Organisme:** {selected_organism}")
 
             with st.spinner("🔄 Analyse en cours..."):
                 result = call_api(smiles_input, selected_organism)
 
+            # Stocker les résultats dans session_state
             if result["success"]:
+                st.session_state['last_prediction'] = {
+                    'result': result,
+                    'smiles': smiles_input,
+                    'organism': selected_organism
+                }
+            else:
+                st.session_state['last_prediction'] = None
+                st.error(f"❌ {result['error']}")
 
-                data = result["data"]
+    # Afficher les résultats s'ils existent dans session_state
+    if 'last_prediction' in st.session_state and st.session_state['last_prediction'] is not None:
+        pred = st.session_state['last_prediction']
+        result = pred['result']
+        smiles_input = pred['smiles']
+        selected_organism = pred['organism']
 
-                # ===============================
-                # 🔬 Vérification toxicité si organisme supporté
-                # ===============================
-                selected_organism_tox = selected_organism  # variable déjà utilisée dans le formulaire Streamlit
+        # Affichage de la prédiction
 
-                if selected_organism_tox in ORGANISMS_TOXICITY_MAPPING.values():
+        if result["success"]:
+            data = result["data"]
 
-                    tox_payload = {
-                        "smiles": smiles_input,
-                        "organism": selected_organism_tox
-                    }
+            # ===============================
+            # 🔬 Vérification toxicité si organisme supporté
+            # ===============================
+            selected_organism_tox = selected_organism  # variable déjà utilisée dans le formulaire Streamlit
 
-                    try:
-                        tox_response = requests.post(
-                            f"{BASE_URI}predict_tox",
-                            json=tox_payload,
-                            timeout=15
-                        )
+            if selected_organism_tox in ORGANISMS_TOXICITY_MAPPING.values():
+                tox_payload = {
+                    "smiles": smiles_input,
+                    "organism": selected_organism_tox
+                }
 
-                        if tox_response.status_code == 200:
-                            tox_data = tox_response.json()
+                try:
+                    tox_response = requests.post(
+                        f"{BASE_URI}predict_tox",
+                        json=tox_payload,
+                        timeout=15
+                    )
 
-                            prob_toxicity = tox_data.get("prob_toxicity", 0.0)
-                            toxic = tox_data.get("toxic", False)
+                    if tox_response.status_code == 200:
+                        tox_data = tox_response.json()
 
-                            if toxic:
-                                st.warning(
-                                    f"La molécule d'intérêt a une probabilité de {prob_toxicity:.3f} "
-                                    f"d'être toxique pour l'organisme étudié"
-                                )
+                        prob_toxicity = tox_data.get("prob_toxicity", 0.0)
+                        toxic = tox_data.get("toxic", False)
 
-                        else:
-                            st.info("ℹ️ Analyse de toxicité non disponible pour cet organisme")
+                        if toxic:
+                            st.warning(
+                                f"La molécule d'intérêt a une probabilité de {prob_toxicity:.3f} "
+                                f"d'être toxique pour l'organisme étudié"
+                            )
 
-                    except Exception:
-                        st.info("ℹ️ Impossible de récupérer la prédiction de toxicité")
+                    else:
+                        st.info("ℹ️ Analyse de toxicité non disponible pour cet organisme")
+
+                except Exception:
+                    st.info("ℹ️ Impossible de récupérer la prédiction de toxicité")
+
+            summary = data.get("summary", "Résumé non disponible")
+            properties = data.get("properties", {})
 
 
-                summary = data.get("summary", "Résumé non disponible")
-                properties = data.get("properties", {})
+            st.markdown(
+                f'<p class="prediction-text" style="font-size:1.5rem;">{summary}</p>',
+                unsafe_allow_html=True
+            )
 
-                st.markdown('<div class="prediction-card">', unsafe_allow_html=True)
+            st.markdown("#### 🧪 Scores par propriété biologique")
 
-                st.markdown(
-                    '<p class="prediction-label">RÉSUMÉ BIOLOGIQUE</p>',
-                    unsafe_allow_html=True
-                )
-
-                st.markdown(
-                    f'<p class="prediction-text" style="font-size:1.5rem;">{summary}</p>',
-                    unsafe_allow_html=True
-                )
-
-                st.markdown("#### 🧪 Scores par propriété biologique")
-
-                for prop, score in properties.items():
-
+            # Affichage en grille 2 colonnes
+            props_list = list(properties.items())
+            cols_per_row = 2
+            for i in range(0, len(props_list), cols_per_row):
+                row_items = props_list[i:i+cols_per_row]
+                cols = st.columns(len(row_items))
+                for col, (prop, score) in zip(cols, row_items):
                     if score >= 0.7:
                         color = "#b8e986"
                     elif score >= 0.4:
@@ -830,31 +929,23 @@ def main():
                     else:
                         color = "#c0c0c0"
 
-                    st.markdown(
-                        f"""
-                        <div class="result-card">
-                            <strong>{prop}</strong>
-                            <div style="margin-top:0.4rem;">
-                                Probabilité prédite :
-                                <strong style="color:{color};">
-                                    {score:.3f}
-                                </strong>
+                    with col:
+                        st.markdown(
+                            f"""
+                            <div class="result-card">
+                                <strong>{prop}</strong>
+                                <div style="margin-top:0.4rem;">
+                                    Probabilité prédite :
+                                    <strong style="color:{color};">
+                                        {score:.3f}
+                                    </strong>
+                                </div>
                             </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                            """,
+                            unsafe_allow_html=True
+                        )
 
-                with st.expander("📊 Réponse brute de l’API"):
-                    st.json(data)
-
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            else:
-                st.error(f"❌ {result['error']}")
-
-            # Affichage de la molécule
-            st.markdown("<h3 style='text-align: center;'>La molécule</h3>",unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
             col_mol1, col_mol2 = st.columns([1, 1])
 
@@ -911,38 +1002,122 @@ def main():
 
             st.markdown("---")
 
-            # Affichage de l'espèce modèle
-            st.markdown("<h3 style='text-align: center;'>L'espèce modèle</h3>",unsafe_allow_html=True)
+            # Affichage : 2 colonnes verticales alignées - Organisme + Propriétés
 
-            col_species1, col_species2, col_species3 = st.columns([1, 2, 1])
+            def get_property_description(property_name: str) -> str:
+                """
+                Retourne la description d'une propriété biologique donnée.
+                """
+                descriptions = {
+                "Stress Oxydatif": "Réaction de la cellule face aux radicaux libres et espèces réactives de l'oxygène. Permet d'évaluer le niveau de dommage oxydatif.",
+                "Mort Cellulaire": "Indique la probabilité que la molécule induise l'apoptose ou la nécrose dans les cellules cibles.",
+                "Métabolisme Énergétique": "Impact potentiel sur la production ou la consommation d'énergie cellulaire, incluant mitochondries et voies métaboliques.",
+                "Signalisation Cellulaire": "Effets sur les voies de signalisation intracellulaires et communication entre cellules."
+                }
+                return descriptions.get(property_name, "Description non disponible.")
 
-            with col_species2:
-                # Récupérer les informations sur l'organisme
-                organism_description = get_organism_info(selected_organism)
+            # 2 colonnes de même taille
+            col_organism, col_properties = st.columns([1, 1])
 
+            # Colonne 1: Organisme
+            with col_organism:
                 st.markdown(f"""
-                <div class="prediction-card" style="text-align: center;">
-                    <p class="prediction-label">ORGANISME SÉLECTIONNÉ</p>
-                    <p class="prediction-text" style="font-size: 1.8rem;">{selected_organism}</p>
-                    <div class="info-box" style="margin-top: 1rem; text-align: left;">
-                        <p style="margin: 0.5rem 0; color: #e0e0e0;">
-                            {organism_description}
+                <div class="prediction-card" style="text-align: center; min-height: 330px;">
+                <p class="prediction-label">ORGANISME SÉLECTIONNÉ</p>
+                <p class="prediction-text" style="font-size: 1.8rem;">{selected_organism}</p>
+                <div class="info-box" style="margin-top: 1rem; text-align: left;">
+                    <p style="margin: 0.5rem 0; color: #e0e0e0;">
+                        {get_organism_info(selected_organism)}
+                    </p>
+                </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # Colonne 2: Propriétés avec sélecteur
+            with col_properties:
+                # Utiliser un container Streamlit avec un style CSS global
+                st.markdown("""
+                <style>
+                /* Cibler spécifiquement cette colonne */
+                div[data-testid="column"]:has(#properties-title) {
+                    background: linear-gradient(135deg, #4a5d4e 0%, #5a6d5e 100%) !important;
+                    padding: 1.5rem !important;
+                    border-radius: 15px !important;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+                    border: 2px solid #6b7d6b !important;
+                    min-height: 400px !important;
+                }
+                </style>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Sélecteur de propriété
+                prop_names = list(properties.keys())
+                prop_options = [f"{name} (Score: {properties[name]:.3f})" for name in prop_names]
+
+                # Initialiser l'index de la propriété sélectionnée dans session_state si nécessaire
+                if 'selected_prop_index' not in st.session_state:
+                    st.session_state.selected_prop_index = 0
+
+                selected_prop_display = st.selectbox(
+                    "Sélectionnez une propriété:",
+                    prop_options,
+                    index=st.session_state.selected_prop_index,
+                    key=f"property_selector_{smiles_input}_{selected_organism}",
+                    label_visibility="visible"
+                )
+
+                # Mettre à jour l'index dans session_state
+                st.session_state.selected_prop_index = prop_options.index(selected_prop_display)
+
+                # Extraire le nom de la propriété sélectionnée
+                selected_prop_name = prop_names[prop_options.index(selected_prop_display)]
+                selected_prop_score = properties[selected_prop_name]
+
+                # Déterminer la couleur selon le score
+                if selected_prop_score >= 0.7:
+                    score_color = "#b8e986"
+                    score_label = "Fort"
+                elif selected_prop_score >= 0.4:
+                    score_color = "#f0d264"
+                    score_label = "Modéré"
+                else:
+                    score_color = "#c0c0c0"
+                    score_label = "Faible"
+
+                # Afficher la description de la propriété sélectionnée
+                st.markdown(f"""
+                <div class="info-box" style="margin-top: 1rem;">
+                    <h4 style="color: #b8e986; margin-top: 0;">{selected_prop_name}</h4>
+                    <p style="margin: 0.8rem 0; color: #e0e0e0; line-height: 1.6;">
+                        {get_property_description(selected_prop_name)}
+                    </p>
+                    <div style="margin-top: 1rem; padding: 0.8rem; background-color: #3d4a3e; border-radius: 8px;">
+                        <p style="margin: 0; color: #d4d4d4;">
+                            <strong>Score prédit:</strong>
+                            <span style="color: {score_color}; font-size: 1.2rem; font-weight: bold;">
+                                {selected_prop_score:.3f}
+                            </span>
+                            <span style="color: {score_color}; margin-left: 0.5rem;">
+                                ({score_label})
+                            </span>
                         </p>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
+        else:
+            st.error(f"❌ {result['error']}")
 
-
-
+    # Message si le bouton est cliqué sans SMILES valide
     elif predict_button:
         st.warning("⚠️ Veuillez entrer un SMILES valide")
 
     # Footer
-    st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #808080; padding: 2rem;'>
-        <p>🧬 BioGNN - Propulsé par Graph Neural Networks</p>
+        <p>🧬 BioGNN - Deep Learning for Biochemistry 🧬</p>
+        <p>Les résultats ne sont que prédictifs et ne visent qu'à aiguiller les décisions en amont d'essais expérimentaux.</p>
     </div>
     """, unsafe_allow_html=True)
 
