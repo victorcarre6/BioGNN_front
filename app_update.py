@@ -405,7 +405,7 @@ def show_team_modal():
             st.markdown(f"<div style='text-align: center; color: #9db89d; font-size: 1rem; margin: 0.3rem 0; height: 2.5rem; line-height: 1.25rem; white-space: pre-line;'>{member['title']}</div>", unsafe_allow_html=True)
 
             # Description avec hauteur fixe
-            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1rem 0; height: 3rem;'>{member['description']}</div>; white-space: pre-line", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1rem 0; height: 3rem;'>{member['description']}</div>", unsafe_allow_html=True)
 
             # Liens
             col1, col2 = st.columns(2)
