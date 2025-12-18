@@ -363,7 +363,7 @@ def show_team_modal():
             "name": "Nisha Dwivedi",
             "title": "PhD in Bioinformatics\nData Scientist",
             "photo": "https://avatars.githubusercontent.com/u/97964928?v=4",
-            "description": "From decoding genomes to decoding data, I bridge biology and data science.",
+            "description": "From decoding genomes to decoding data,\nI bridge biology and data science.",
             "linkedin": "https://www.linkedin.com/in/nisha-dwivedi-108b64206/",
             "github": "https://github.com/nishadwivedi97"
         },
