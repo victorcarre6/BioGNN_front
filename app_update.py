@@ -371,7 +371,7 @@ def show_team_modal():
             "name": "Jalil Kheloufi",
             "title": "Data Scientist\n ",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
-            "description": "CRM Developer at Salesforce. Passionate about data science and AI.",
+            "description": "CRM Developer at Salesforce.\nPassionate about data science and AI.",
             "linkedin": "https://www.linkedin.com/in/jalilkheloufi/",
             "github": "https://github.com/Soipadeg"
         },
@@ -405,7 +405,7 @@ def show_team_modal():
             st.markdown(f"<div style='text-align: center; color: #9db89d; font-size: 1rem; margin: 0.3rem 0; height: 2.5rem; line-height: 1.25rem; white-space: pre-line;'>{member['title']}</div>", unsafe_allow_html=True)
 
             # Description avec hauteur fixe
-            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1rem 0; height: 3rem;'>{member['description']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1rem 0; height: 3rem;'>{member['description']}</div>; white-space: pre-line", unsafe_allow_html=True)
 
             # Liens
             col1, col2 = st.columns(2)
@@ -760,7 +760,7 @@ def main():
     # En-tête
     st.markdown("<h1 style='text-align: center;'>🧬 BioGNN 🧬 <br>From atoms to action</h1>",unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #b0b0b0; font-size: 1.2rem;'>Prédiction de propriétés biologiques par Graph Neural Networks</p>", unsafe_allow_html=True)
-
+    st.markdown("<p style='text-align: center; color: #b0b0b0; font-size: 1rem;'>Propriétés disponibles : Stress Oxydatif, Métabolisme Énergétique, Mort Cellulaire et Signalisation Cellulaire</p>", unsafe_allow_html=True)
     st.markdown("---")
 
     # Sidebar - Informations et paramètres
@@ -912,7 +912,7 @@ def main():
 
                         if toxic:
                             st.error(
-                                f"La molécule d'intérêt a une probabilité de {prob_toxicity:.3f} "
+                                f"La molécule d'intérêt a une probabilité de {prob_toxicity:.2f} "
                                 f"d'être toxique pour l'organisme étudié. Soyez attentifs aux dosages."
                             )
 
@@ -1074,7 +1074,7 @@ def main():
 
                 # Sélecteur de propriété
                 prop_names = list(properties.keys())
-                prop_options = [f"{name} (Score: {properties[name]:.3f})" for name in prop_names]
+                prop_options = [f"{name} (Score: {properties[name]:.2f})" for name in prop_names]
 
                 # Initialiser l'index de la propriété sélectionnée dans session_state si nécessaire
                 if 'selected_prop_index' not in st.session_state:
@@ -1117,7 +1117,7 @@ def main():
                         <p style="margin: 0; color: #d4d4d4;">
                             <strong>Score prédit:</strong>
                             <span style="color: {score_color}; font-size: 1.2rem; font-weight: bold;">
-                                {selected_prop_score:.3f}
+                                {selected_prop_score:.2f}
                             </span>
                             <span style="color: {score_color}; margin-left: 0.5rem;">
                                 ({score_label})
