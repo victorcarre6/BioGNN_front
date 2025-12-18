@@ -48,53 +48,53 @@ st.set_page_config(
 )
 
 # API Configuration
-GCP_API_URL = "https://biognn-third-api-223608804946.europe-west1.run.app/"
+BASE_URI = "https://biognn-third-api-223608804946.europe-west1.run.app/"
 
-def get_api_url():
-    """
-    Détermine l'URL de l'API à utiliser selon l'environnement:
-    1. Si une variable d'environnement API_URL est définie, l'utiliser
-    2. Si en local (détection via secrets), utiliser local_api_uri ou local_docker_uri
-    3. Si cloud_api_uri est défini dans secrets, l'utiliser
-    4. Sinon, utiliser l'URL GCP par défaut
-    """
-    # Priority 1: Variable d'environnement directe
-    if 'API_URL' in os.environ:
-        url = os.environ['API_URL']
-        return url if url.endswith('/') else url + '/'
+# def get_api_url():
+#     """
+#     Détermine l'URL de l'API à utiliser selon l'environnement:
+#     1. Si une variable d'environnement API_URL est définie, l'utiliser
+#     2. Si en local (détection via secrets), utiliser local_api_uri ou local_docker_uri
+#     3. Si cloud_api_uri est défini dans secrets, l'utiliser
+#     4. Sinon, utiliser l'URL GCP par défaut
+#     """
+#     # Priority 1: Variable d'environnement directe
+#     if 'API_URL' in os.environ:
+#         url = os.environ['API_URL']
+#         return url if url.endswith('/') else url + '/'
 
-    # Priority 2: Vérifier si secrets.toml existe et contient des URLs
-    try:
-        # Détecter si on est en environnement local
-        # Si local_api_uri ou local_docker_uri existe dans secrets, on est probablement en local
-        if hasattr(st.secrets, 'get'):
-            # Mode local: priorité à local_api_uri si disponible
-            if 'local_api_uri' in st.secrets:
-                # Vérifier si on force l'usage de l'API locale
-                use_local = st.secrets.get('use_local_api', False)
-                if use_local:
-                    url = st.secrets['local_api_uri']
-                    return url if url.endswith('/') else url + '/'
+#     # Priority 2: Vérifier si secrets.toml existe et contient des URLs
+#     try:
+#         # Détecter si on est en environnement local
+#         # Si local_api_uri ou local_docker_uri existe dans secrets, on est probablement en local
+#         if hasattr(st.secrets, 'get'):
+#             # Mode local: priorité à local_api_uri si disponible
+#             if 'local_api_uri' in st.secrets:
+#                 # Vérifier si on force l'usage de l'API locale
+#                 use_local = st.secrets.get('use_local_api', False)
+#                 if use_local:
+#                     url = st.secrets['local_api_uri']
+#                     return url if url.endswith('/') else url + '/'
 
-            # Docker local
-            if 'local_docker_uri' in st.secrets:
-                use_docker = st.secrets.get('use_docker_api', False)
-                if use_docker:
-                    url = st.secrets['local_docker_uri']
-                    return url if url.endswith('/') else url + '/'
+#             # Docker local
+#             if 'local_docker_uri' in st.secrets:
+#                 use_docker = st.secrets.get('use_docker_api', False)
+#                 if use_docker:
+#                     url = st.secrets['local_docker_uri']
+#                     return url if url.endswith('/') else url + '/'
 
-            # Cloud API (production ou ancien déploiement)
-            if 'cloud_api_uri' in st.secrets:
-                url = st.secrets['cloud_api_uri']
-                return url if url.endswith('/') else url + '/'
-    except Exception:
-        # Si erreur d'accès aux secrets, continuer avec le fallback
-        pass
+#             # Cloud API (production ou ancien déploiement)
+#             if 'cloud_api_uri' in st.secrets:
+#                 url = st.secrets['cloud_api_uri']
+#                 return url if url.endswith('/') else url + '/'
+#     except Exception:
+#         # Si erreur d'accès aux secrets, continuer avec le fallback
+#         pass
 
-    # Priority 3: URL GCP par défaut
-    return GCP_API_URL if GCP_API_URL.endswith('/') else GCP_API_URL + '/'
+#     # Priority 3: URL GCP par défaut
+#     return GCP_API_URL if GCP_API_URL.endswith('/') else GCP_API_URL + '/'
 
-BASE_URI = get_api_url()
+# BASE_URI = get_api_url()
 
 # ============================================================================
 # STYLES CSS PERSONNALISÉS
@@ -912,7 +912,7 @@ def main():
 
                         if toxic:
                             st.error(
-                                f"La molécule d'intérêt a une probabilité de {prob_toxicity:.2f} "
+                                f"La molécule d'intérêt a une probabilité de {prob_toxicity:.3f} "
                                 f"d'être toxique pour l'organisme étudié. Soyez attentifs aux dosages."
                             )
 
@@ -922,9 +922,16 @@ def main():
                 except Exception:
                     st.info("ℹ️ Impossible de récupérer la prédiction de toxicité")
 
-            summary = data.get("summary", "Résumé non disponible")
             properties = data.get("properties", {})
 
+            # Générer dynamiquement le summary basé sur un threshold
+            threshold = 0.8
+            promising_properties = [prop for prop, score in properties.items() if score >= threshold]
+
+            if promising_properties:
+                summary = f"Candidat prometteur pour : {', '.join(promising_properties)}"
+            else:
+                summary = f"Aucune propriété fortement prédite (probabilités < {threshold:.2f})"
 
             st.markdown(
                 f'<p class="prediction-text" style="font-size:1.5rem;">{summary}</p>',
@@ -953,7 +960,7 @@ def main():
                             <div class="result-card">
                                 <strong>{prop}</strong>
                                 <div style="margin-top:0.4rem;">
-                                    Probabilité prédite :
+                                    Probabilité d'activité :
                                     <strong style="color:{color};">
                                         {score:.3f}
                                     </strong>
