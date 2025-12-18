@@ -48,7 +48,7 @@ st.set_page_config(
 )
 
 # API Configuration
-GCP_API_URL = "https://biognn-api-271034908172.europe-west1.run.app/"
+GCP_API_URL = "https://biognn-609763650618.europe-west1.run.app/"
 
 def get_api_url():
     """
@@ -361,7 +361,7 @@ def show_team_modal():
         },
         {
             "name": "Nisha Dwivedi",
-            "title": "PhD in Molecular Biology\nData Scientist",
+            "title": "PhD in Bioinformatics\nData Scientist",
             "photo": "https://avatars.githubusercontent.com/u/97964928?v=4",
             "description": "Placeholder",
             "linkedin": "https://www.linkedin.com/in/nisha-dwivedi-108b64206/",
@@ -889,7 +889,7 @@ def main():
             # ===============================
             # 🔬 Vérification toxicité si organisme supporté
             # ===============================
-            selected_organism_tox = selected_organism  # variable déjà utilisée dans le formulaire Streamlit
+            selected_organism_tox = selected_organism
 
             if selected_organism_tox in ORGANISMS_TOXICITY_MAPPING.values():
                 tox_payload = {
