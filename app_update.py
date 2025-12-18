@@ -402,6 +402,10 @@ def show_team_modal():
 
             # Nom et titre avec hauteur fixe
             st.markdown(f"<h4 style='text-align: center; color: #b8e986; font-size: 1.5rem; margin: 0.5rem 0;'>{member['name']}</h4>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; color: #9db89d; font-size: 1rem; margin: 0.3rem 0; height: 2.5rem; line-height: 1.25rem; white-space: pre-line;'>{member['title']}</div>", unsafe_allow_html=True)
+
+            # Description avec hauteur fixe
+            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1rem 0; height: 2rem;'>{member['description']}</div>", unsafe_allow_html=True)
 
             # Liens
             col1, col2 = st.columns(2)
@@ -409,11 +413,6 @@ def show_team_modal():
                 st.markdown(f"<a href='{member['linkedin']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #0077b5; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>LinkedIn</a>", unsafe_allow_html=True)
             with col2:
                 st.markdown(f"<a href='{member['github']}' target='_blank' style='display: block; text-align: center; padding: 0.5rem; background: #333; color: white; text-decoration: none; border-radius: 5px; font-size: 0.85rem;'>GitHub</a>", unsafe_allow_html=True)
-
-            st.markdown(f"<div style='text-align: center; color: #9db89d; font-size: 1rem; margin: 0.8rem 0; height: 2.5rem; line-height: 1.25rem; white-space: pre-line;'>{member['title']}</div>", unsafe_allow_html=True)
-
-            # Description avec hauteur fixe
-            st.markdown(f"<div style='text-align: center; color: #d4d4d4; font-size: 1rem; margin: 1rem 0; height: 1.5rem;'>{member['description']}</div>", unsafe_allow_html=True)
 
 @st.dialog("🧠 Informations sur le Modèle", width="large")
 def show_model_info():
