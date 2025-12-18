@@ -48,7 +48,7 @@ st.set_page_config(
 )
 
 # API Configuration
-GCP_API_URL = "https://biognn-609763650618.europe-west1.run.app/"
+GCP_API_URL = "https://biognn-third-api-223608804946.europe-west1.run.app/"
 
 def get_api_url():
     """
