@@ -355,7 +355,7 @@ def show_team_modal():
             "name": "Victor Carré",
             "title": "PhD in Organic Chemistry\nData Scientist",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQGVWlViiqc8YA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721578462243?e=1767225600&v=beta&t=PXmCdebrZyzU2R3SLz_0VEEkzK-2uOXEn8pLOaXJf_M",
-            "description": "Placeholder",
+            "description": "Bringing photochemistry expertise with Data Science to decode molecular behavior.",
             "linkedin": "https://www.linkedin.com/in/victor-carré",
             "github": "https://github.com/victorcarre6"
         },
@@ -363,7 +363,7 @@ def show_team_modal():
             "name": "Nisha Dwivedi",
             "title": "PhD in Bioinformatics\nData Scientist",
             "photo": "https://avatars.githubusercontent.com/u/97964928?v=4",
-            "description": "Placeholder",
+            "description": "From decoding genomes to decoding data, I bridge biology and data science.",
             "linkedin": "https://www.linkedin.com/in/nisha-dwivedi-108b64206/",
             "github": "https://github.com/nishadwivedi97"
         },
@@ -371,7 +371,7 @@ def show_team_modal():
             "name": "Jalil Kheloufi",
             "title": "Data Scientist\n ",
             "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
-            "description": "Placeholder",
+            "description": "CRM Developer at Salesforce. Passionate about data science and AI.",
             "linkedin": "https://www.linkedin.com/in/jalilkheloufi/",
             "github": "https://github.com/Soipadeg"
         },
@@ -379,7 +379,7 @@ def show_team_modal():
             "name": "Jean-Charles Bodart",
             "title": "Data Scientist\n ",
             "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
-            "description": "Placeholder",
+            "description": "Turning raw data into strategic decisions through data-driven thinking.",
             "linkedin": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
             "github": "https://github.com/jeancharlesbodart-commits"
         }
@@ -780,7 +780,7 @@ def main():
         st.markdown("---")
         st.markdown("### 📖 À propos")
         st.markdown("""
-        **BioGNN** est un modèle prédictif d'activité biologique. Insérez le code SMILES d'une molécule et l'organisme d'étude pour prédire les propriétés sur lesquelles elle aura un impact.\n
+        **BioGNN** est un modèle prédictif d'activité biologique de molécules sur des organismes modèles.\n
         Projet réalisé dans le cadre des projets du Bootcamp Data Science & IA de Le Wagon.
         """)
         st.markdown("---")
@@ -911,9 +911,9 @@ def main():
                         toxic = tox_data.get("toxic", False)
 
                         if toxic:
-                            st.warning(
+                            st.error(
                                 f"La molécule d'intérêt a une probabilité de {prob_toxicity:.3f} "
-                                f"d'être toxique pour l'organisme étudié"
+                                f"d'être toxique pour l'organisme étudié. Soyez attentifs aux dosages."
                             )
 
                     else:
@@ -1137,7 +1137,7 @@ def main():
     # Footer
     st.markdown("""
     <div style='text-align: center; color: #808080; padding: 2rem;'>
-        <p>🧬 BioGNN - Deep Learning for Biochemistry 🧬</p>
+        <p>🧬 BioGNN - Deep Learning for Molecular Discovery 🧬</p>
         <p>Les résultats ne sont que prédictifs et ne visent qu'à aiguiller les décisions en amont d'essais expérimentaux.</p>
     </div>
     """, unsafe_allow_html=True)
