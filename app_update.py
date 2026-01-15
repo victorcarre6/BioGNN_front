@@ -763,7 +763,7 @@ def main():
     st.markdown("<p style='text-align: center; color: #b0b0b0; font-size: 1rem;'>Propriétés disponibles : Stress Oxydatif, Métabolisme Énergétique, Mort Cellulaire et Signalisation Cellulaire</p>", unsafe_allow_html=True)
 
     # Message de maintenance
-    st.warning("**Interface en maintenance**, le service de prédiction n'est pas disponible actuellement. Nous travaillons à améliorer les modèles.\n Pour toute question, contactez-nous via la section 'About the team' dans la barre latérale.", icon="⚠️")
+    st.warning("**Interface en maintenance**, le service de prédiction n'est pas disponible actuellement. Nous travaillons à améliorer les modèles. Pour toute question, contactez-nous via la section 'About the team'.", icon="⚠️")
 
     st.markdown("---")
 
