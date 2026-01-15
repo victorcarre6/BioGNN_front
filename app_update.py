@@ -354,7 +354,7 @@ def show_team_modal():
         {
             "name": "Victor Carré",
             "title": "PhD in Organic Chemistry\nData Scientist",
-            "photo": "https://media.licdn.com/dms/image/v2/D4E03AQGVWlViiqc8YA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721578462243?e=1767225600&v=beta&t=PXmCdebrZyzU2R3SLz_0VEEkzK-2uOXEn8pLOaXJf_M",
+            "photo": "https://media.licdn.com/dms/image/v2/D4E03AQGVWlViiqc8YA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1721578462216?e=1770249600&v=beta&t=fx2mPDwqFT8gIJLfyiRUm0Iqha_pTl5z-erQ_X8Sn_k",
             "description": "Bringing photochemistry expertise with Data Science to decode molecular behavior.",
             "linkedin": "https://www.linkedin.com/in/victor-carré",
             "github": "https://github.com/victorcarre6"
@@ -370,7 +370,7 @@ def show_team_modal():
         {
             "name": "Jalil Kheloufi",
             "title": "Data Scientist\n ",
-            "photo": "https://media.licdn.com/dms/image/v2/D4E03AQEzs0-wkrE4gg/profile-displayphoto-shrink_800_800/B4EZQ8udQ9G4Ac-/0/1736185599605?e=1767225600&v=beta&t=7oR82b7G8SmXhePojlejLQXaqzdV4n1VmfELTReKOzk",
+            "photo": "https://media.licdn.com/dms/image/v2/D4E03AQHbX-LGcVP8OQ/profile-displayphoto-crop_800_800/B4EZuh8EgtHAAM-/0/1767948438578?e=1770249600&v=beta&t=d4BHiMlY_nWqTCaVcZ4wGNr2AC-1zvxPZ4XJexDleh8",
             "description": "CRM Developer at Salesforce.\nPassionate about data science and AI.",
             "linkedin": "https://www.linkedin.com/in/jalilkheloufi/",
             "github": "https://github.com/Soipadeg"
@@ -378,7 +378,7 @@ def show_team_modal():
         {
             "name": "Jean-Charles Bodart",
             "title": "Data Scientist\n ",
-            "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1767225600&v=beta&t=fem0yJcUaLU4O4CLm8sp8Wh9yYzhgJjQI6-53rXOG5g",
+            "photo": "https://media.licdn.com/dms/image/v2/C4E03AQHPxvytYnRNVQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659509572655?e=1770249600&v=beta&t=c0j-jtrIjehTeiKOISr2Gg_XG9j1onnsFFqSNtqvgIU",
             "description": "Turning raw data into strategic decisions through data-driven thinking.",
             "linkedin": "https://www.linkedin.com/in/jean-charles-bodart-492a40a0/",
             "github": "https://github.com/jeancharlesbodart-commits"
@@ -763,7 +763,7 @@ def main():
     st.markdown("<p style='text-align: center; color: #b0b0b0; font-size: 1rem;'>Propriétés disponibles : Stress Oxydatif, Métabolisme Énergétique, Mort Cellulaire et Signalisation Cellulaire</p>", unsafe_allow_html=True)
 
     # Message de maintenance
-    st.warning("⚠️ **Site en maintenance** - Le service de prédiction n'est pas disponible actuellement. Nous travaillons à améliorer l'application. Merci de votre patience !")
+    st.warning("⚠️ **Interface en maintenance**, le service de prédiction n'est pas disponible actuellement. Nous travaillons à améliorer les modèles.\n Pour toute question, contactez-nous via la section 'About the team' dans la barre latérale.", icon="⚠️")
 
     st.markdown("---")
 
