@@ -761,6 +761,10 @@ def main():
     st.markdown("<h1 style='text-align: center;'>🧬 BioGNN 🧬 <br>From atoms to action</h1>",unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #b0b0b0; font-size: 1.2rem;'>Prédiction de propriétés biologiques par Graph Neural Networks</p>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #b0b0b0; font-size: 1rem;'>Propriétés disponibles : Stress Oxydatif, Métabolisme Énergétique, Mort Cellulaire et Signalisation Cellulaire</p>", unsafe_allow_html=True)
+
+    # Message de maintenance
+    st.warning("⚠️ **Site en maintenance** - Le service de prédiction n'est pas disponible actuellement. Nous travaillons à améliorer l'application. Merci de votre patience !")
+
     st.markdown("---")
 
     # Sidebar - Informations et paramètres
@@ -843,7 +847,7 @@ def main():
     st.markdown("<br>", unsafe_allow_html=True)
     col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
     with col_btn2:
-        predict_button = st.button("PRÉDIRE", use_container_width=True,type="primary")
+        predict_button = st.button("PRÉDIRE", use_container_width=True, type="primary", disabled=True)
 
     st.markdown("---")
 
